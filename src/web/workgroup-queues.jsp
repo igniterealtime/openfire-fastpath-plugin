@@ -1,5 +1,7 @@
-<%@ page contentType="text/html; charset=UTF-8" %>
 <%--
+   -	$RCSfile$
+   -	$Revision: 32926 $
+   -	$Date: 2006-08-04 15:39:24 -0700 (Fri, 04 Aug 2006) $
 --%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ page import="org.jivesoftware.xmpp.workgroup.RequestQueue,
@@ -527,7 +529,7 @@ else if (deleted) { %>
                     </td>
                     <td>
                         <select name="editVariable">
-                            <% if (dataForm != null) for (FormField field : dataForm.getFields()) { %>
+                            <% for (FormField field : dataForm.getFields()) { %>
                             <option value="<%= field.getVariable()%>" <%= field.getVariable().equals(variable) ? "selected" : ""%>><%= field.getVariable()%></option>
                             <% } %>
 
@@ -577,7 +579,7 @@ else if (deleted) { %>
 %>
 
 <div style="<%= edit ? "display:none;" : "" %>" class="jive-contentBox">
-      <h4>Create New Routing Rule</h4>
+	  <h4>Create New Routing Rule</h4>
 
     <table cellspacing="0" cellpadding="3">
         <form action="workgroup-queues.jsp" method="post">
@@ -601,7 +603,7 @@ else if (deleted) { %>
                             </td>
                             <td>
                                 <select name="variable" onchange="updateForm(this);">
-                                    <% if (dataForm != null) for (FormField field : dataForm.getFields()) {
+                                    <% for (FormField field : dataForm.getFields()) {
                                             if(formElement == null){
                                                 formElement = field.getVariable();
                                             }
@@ -620,7 +622,7 @@ else if (deleted) { %>
                             <%
                                 for (org.jivesoftware.openfire.fastpath.dataforms.FormElement ele : form
                                         .getFormElements()) {
-                                    if (formElement != null && formElement.equals(ele.getVariable())) {
+                                    if (formElement.equals(ele.getVariable())) {
                                         out.println(FormUtils.createAnswers(ele, "value"));
                                     }
                                 }
