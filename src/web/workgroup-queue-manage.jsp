@@ -1,6 +1,8 @@
-<%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%--
+  -	$RCSfile$
+  -	$Revision: 32958 $
+  -	$Date: 2006-08-07 09:12:40 -0700 (Mon, 07 Aug 2006) $
 --%>
 <%@ page
 import   ="java.util.*,
