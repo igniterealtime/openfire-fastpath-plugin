@@ -1,4 +1,8 @@
-/*
+/**
+ * $RCSfile$
+ * $Revision: 32833 $
+ * $Date: 2006-08-02 15:52:36 -0700 (Wed, 02 Aug 2006) $
+ *
  * Copyright (C) 2004-2008 Jive Software. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -58,9 +62,9 @@ import org.slf4j.LoggerFactory;
  * @author Iain Shigeoka
  */
 public class RoundRobinDispatcher implements Dispatcher, AgentSessionListener {
-    
-    private static final Logger Log = LoggerFactory.getLogger(RoundRobinDispatcher.class);
-            
+	
+	private static final Logger Log = LoggerFactory.getLogger(RoundRobinDispatcher.class);
+			
     /**
      * <p>The circular list of agents in the pool.</p>
      */
@@ -109,7 +113,7 @@ public class RoundRobinDispatcher implements Dispatcher, AgentSessionListener {
 
         TaskEngine.getInstance().scheduleAtFixedRate(new TimerTask() {
             @Override
-            public void run() {
+			public void run() {
                 checkForNewRequests();
             }
         }, 2000, 2000);
@@ -134,7 +138,7 @@ public class RoundRobinDispatcher implements Dispatcher, AgentSessionListener {
         // Process this offer in another thread
         Thread offerThread = new Thread("Dispatch offer - queue: " + queue.getName()) {
             @Override
-            public void run() {
+			public void run() {
                 dispatch(offer);
                 // Remove this offer from the list of active offers
                 offers.remove(offer);
