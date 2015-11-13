@@ -1,4 +1,8 @@
-/*
+/**
+ * $RCSfile$
+ * $Revision: 3144 $
+ * $Date: 2005-12-01 14:20:11 -0300 (Thu, 01 Dec 2005) $
+ *
  * Copyright (C) 2004-2008 Jive Software. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -57,7 +61,7 @@ import org.xmpp.packet.JID;
  */
 public class ChatTranscriptManager {
 
-    private static final Logger Log = LoggerFactory.getLogger(ChatTranscriptManager.class);
+	private static final Logger Log = LoggerFactory.getLogger(ChatTranscriptManager.class);
 
     private static final String GET_WORKGROUP_SESSIONS =
             "SELECT sessionID, userID, startTime, endTime, queueWaitTime, state " +
