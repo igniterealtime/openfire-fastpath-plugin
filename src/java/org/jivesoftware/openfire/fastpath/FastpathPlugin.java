@@ -1,4 +1,7 @@
-/*
+/**
+ * $Revision: $
+ * $Date: $
+ *
  * Copyright (C) 2004-2008 Jive Software. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,7 +21,6 @@ package org.jivesoftware.openfire.fastpath;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.util.Collection;
 
 import org.jivesoftware.openfire.cluster.ClusterEventListener;
 import org.jivesoftware.openfire.cluster.ClusterManager;
@@ -44,8 +46,8 @@ import org.xmpp.packet.JID;
  */
 public class FastpathPlugin implements Plugin, ClusterEventListener {
 
-    private static final Logger Log = LoggerFactory.getLogger(FastpathPlugin.class);
-
+	private static final Logger Log = LoggerFactory.getLogger(FastpathPlugin.class);
+	
     /**
      * Keep a reference to Fastpath only when the service is up and running in this JVM.
      */
@@ -133,14 +135,6 @@ public class FastpathPlugin implements Plugin, ClusterEventListener {
         }
         // Clean up the reference to the workgroup manager as a way to say that FP is no longer running in this JVM
         workgroupManager = null;
-    }
-
-    public WorkgroupManager getWorkgroupManager() {
-        return workgroupManager;
-    }
-
-    public Collection<Workgroup> getWorkgroups() {
-        return workgroupManager.getWorkgroups();
     }
 
     public void joinedCluster() {
