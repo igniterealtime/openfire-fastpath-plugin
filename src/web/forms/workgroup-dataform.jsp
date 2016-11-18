@@ -1,4 +1,3 @@
-<%@ page contentType="text/html; charset=UTF-8" %>
 <%@ page import="org.jivesoftware.util.ParamUtils,
                  org.jivesoftware.xmpp.workgroup.WorkgroupManager,
                  org.jivesoftware.xmpp.workgroup.Workgroup,
@@ -116,7 +115,7 @@
 </p>
 <% if(save){ %>
  <div class="success">
-            <%= message %>
+        	<%= message %>
 </div>
 <% } %>
 
