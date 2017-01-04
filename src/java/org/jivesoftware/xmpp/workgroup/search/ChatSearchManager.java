@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright (C) 2004-2008 Jive Software. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -115,7 +115,7 @@ import org.xmpp.packet.JID;
  */
 public class ChatSearchManager implements WorkgroupEventListener {
 
-    private static final Logger Log = LoggerFactory.getLogger(ChatSearchManager.class);
+	private static final Logger Log = LoggerFactory.getLogger(ChatSearchManager.class);
 
     private static final String CHATS_SINCE_DATE =
             "SELECT sessionID,transcript,startTime FROM fpSession WHERE workgroupID=? AND " +

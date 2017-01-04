@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright (C) 1999-2008 Jive Software. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -37,7 +37,7 @@ import org.xmpp.packet.PacketError;
 
 public class ChatMetadataProvider implements WorkgroupProvider {
 
-    private static final Logger Log = LoggerFactory.getLogger(ChatMetadataProvider.class);
+	private static final Logger Log = LoggerFactory.getLogger(ChatMetadataProvider.class);
 
     private static final String GET_SESSION_METADATA =
             "SELECT metadataName, metadataValue FROM fpSessionMetadata WHERE sessionID=?";

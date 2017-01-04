@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright (C) 1999-2008 Jive Software. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -119,7 +119,7 @@ public class WorkgroupForm {
         }
 
         @Override
-        public String toString() {
+		public String toString() {
             return (key);
         }
     }

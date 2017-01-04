@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright (C) 2004-2008 Jive Software. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -40,8 +40,8 @@ import org.xmpp.packet.PacketError;
 
 public class WorkgroupStats {
 
-    private static final Logger Log = LoggerFactory.getLogger(WorkgroupStats.class);
-    
+	private static final Logger Log = LoggerFactory.getLogger(WorkgroupStats.class);
+	
     private static final String GET_SESSIONS_WITH_TRANSCRIPTS =
             "SELECT sessionID, startTime, endTime FROM fpSession WHERE workgroupID=? AND " +
             "userID=? AND transcript IS NOT NULL";

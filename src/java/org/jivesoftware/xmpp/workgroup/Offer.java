@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright (C) 2004-2008 Jive Software. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -259,12 +259,12 @@ public class Offer {
     }
 
     @Override
-    public int hashCode() {
+	public int hashCode() {
         return request.hashCode();
     }
 
     @Override
-    public boolean equals(Object obj) {
+	public boolean equals(Object obj) {
         boolean eq = false;
         if (obj instanceof Offer){
             Offer otherOffer = (Offer)obj;

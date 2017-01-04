@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright (C) 2004-2008 Jive Software. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ public class BasicRequestFilterFactory extends RequestFilterFactory {
     RequestFilter filter = new BasicRequestFilter();
 
     @Override
-    public RequestFilter getFilter() {
+	public RequestFilter getFilter() {
         return filter;
     }
 }

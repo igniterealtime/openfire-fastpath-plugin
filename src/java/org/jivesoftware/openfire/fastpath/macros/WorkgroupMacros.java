@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright (C) 1999-2008 Jive Software. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -31,8 +31,8 @@ import com.thoughtworks.xstream.XStream;
 
 public class WorkgroupMacros {
 
-    private static final Logger Log = LoggerFactory.getLogger(WorkgroupMacros.class);
-    
+	private static final Logger Log = LoggerFactory.getLogger(WorkgroupMacros.class);
+	
     private Map<Workgroup, MacroGroup> rootGroups = new HashMap<Workgroup, MacroGroup>();
 
     private static WorkgroupMacros singleton;

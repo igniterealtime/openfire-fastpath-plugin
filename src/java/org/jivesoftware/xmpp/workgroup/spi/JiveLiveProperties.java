@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright (C) 2004-2008 Jive Software. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -38,8 +38,8 @@ import org.slf4j.LoggerFactory;
  */
 public class JiveLiveProperties implements DbProperties {
 
-    private static final Logger Log = LoggerFactory.getLogger(JiveLiveProperties.class);
-    
+	private static final Logger Log = LoggerFactory.getLogger(JiveLiveProperties.class);
+	
     private long id;
     private Map<String, String> properties = new ConcurrentHashMap<String, String>();
     private String tableName;
