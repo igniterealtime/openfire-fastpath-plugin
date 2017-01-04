@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright (C) 2004-2006 Jive Software. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -30,8 +30,8 @@ import org.slf4j.LoggerFactory;
  */
 public class DbWorkgroup {
 
-    private static final Logger Log = LoggerFactory.getLogger(DbWorkgroup.class);
-    
+	private static final Logger Log = LoggerFactory.getLogger(DbWorkgroup.class);
+	
     private static final String UPDATE_TRANSCRIPT =
             "UPDATE fpSession SET transcript=?, endTime=? WHERE sessionID=?";
     private static final String INSERT_AGENT_SESSION =

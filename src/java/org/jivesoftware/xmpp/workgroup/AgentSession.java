@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright (C) 2004-2008 Jive Software. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -52,7 +52,7 @@ import org.xmpp.packet.Presence;
  */
 public class AgentSession {
 
-    private static final Logger Log = LoggerFactory.getLogger(AgentSession.class);
+	private static final Logger Log = LoggerFactory.getLogger(AgentSession.class);
 
     private static final FastDateFormat UTC_FORMAT = FastDateFormat.getInstance("yyyyMMdd'T'HH:mm:ss", TimeZone.getTimeZone("GMT+0"));
 
@@ -324,7 +324,7 @@ public class AgentSession {
     }
 
     @Override
-    public String toString() {
+	public String toString() {
         return "AI-" + Integer.toHexString(hashCode()) +
             " JID " + address.toString() +
             " CC " + Integer.toString(chatInfos.size()) +
@@ -441,7 +441,7 @@ public class AgentSession {
     }
 
     @Override
-    public boolean equals(Object o) {
+	public boolean equals(Object o) {
         boolean match = false;
         if (o instanceof AgentSession) {
             match = ((AgentSession)o).getJID().equals(address);
@@ -560,11 +560,11 @@ public class AgentSession {
     }
 
     /**
-     * This agent is no longer related to this offer. The agent may have been selected to answer
+     * This agent is not longer related to this offer. The agent may have been selected to answer
      * the user's request or the offer has been assigned to another agent or the request was
      * cancelled.
      *
-     * @param offer the offer that is no longer related to this agent.
+     * @param offer the offer that is not longer related to this agent.
      */
     public void removeOffer(Offer offer) {
         if (offer.equals(this.offer)) {

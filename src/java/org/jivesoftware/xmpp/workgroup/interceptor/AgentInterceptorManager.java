@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright (C) 2004-2008 Jive Software. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -41,12 +41,12 @@ public class AgentInterceptorManager extends InterceptorManager {
     }
 
     @Override
-    protected String getPropertySuffix() {
+	protected String getPropertySuffix() {
         return "agent";
     }
 
     @Override
-    protected Collection<Class> getBuiltInInterceptorClasses() {
+	protected Collection<Class> getBuiltInInterceptorClasses() {
         return Arrays.asList((Class) TrafficMonitor.class);
     }
 }

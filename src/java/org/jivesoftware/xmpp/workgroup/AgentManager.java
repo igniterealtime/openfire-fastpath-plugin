@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright (C) 2004-2006 Jive Software. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -49,7 +49,7 @@ import org.xmpp.packet.JID;
  */
 public class AgentManager {
 
-    private static final Logger Log = LoggerFactory.getLogger(AgentManager.class);
+	private static final Logger Log = LoggerFactory.getLogger(AgentManager.class);
 
     private static final String LOAD_AGENTS =
             "SELECT agentID FROM fpAgent";

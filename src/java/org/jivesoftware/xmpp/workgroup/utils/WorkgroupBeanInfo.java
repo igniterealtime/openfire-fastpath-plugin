@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright (C) 1999-2008 Jive Software. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -34,8 +34,8 @@ import org.slf4j.LoggerFactory;
 
 public abstract class WorkgroupBeanInfo implements BeanInfo {
 
-    private static final Logger Log = LoggerFactory.getLogger(WorkgroupBeanInfo.class);
-    
+	private static final Logger Log = LoggerFactory.getLogger(WorkgroupBeanInfo.class);
+	
     private ResourceBundle bundle;
 
     public WorkgroupBeanInfo() {

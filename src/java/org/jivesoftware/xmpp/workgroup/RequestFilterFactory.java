@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright (C) 2004-2008 Jive Software. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -36,8 +36,8 @@ import org.slf4j.LoggerFactory;
  */
 abstract public class RequestFilterFactory {
 
-    private static final Logger Log = LoggerFactory.getLogger(RequestFilterFactory.class);
-    
+	private static final Logger Log = LoggerFactory.getLogger(RequestFilterFactory.class);
+	
     /** <p>The factory to be used.</p> */
     private static RequestFilterFactory factory;
 

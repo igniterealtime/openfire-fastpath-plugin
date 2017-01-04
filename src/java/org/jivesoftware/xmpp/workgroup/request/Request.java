@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright (C) 2004-2008 Jive Software. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -48,8 +48,8 @@ import org.xmpp.packet.JID;
  */
 public abstract class Request {
 
-    private static final Logger Log = LoggerFactory.getLogger(Request.class);
-    
+	private static final Logger Log = LoggerFactory.getLogger(Request.class);
+	
     private static final Map<String, Request> requests = new ConcurrentHashMap<String, Request>();
 
     protected final String requestID;

@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright (C) 1999-2008 Jive Software. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -45,7 +45,7 @@ import com.thoughtworks.xstream.XStream;
  */
 public class ChatSettingsCreator {
 
-    private static final Logger Log = LoggerFactory.getLogger(ChatSettingsCreator.class);
+	private static final Logger Log = LoggerFactory.getLogger(ChatSettingsCreator.class);
 
     private static final ChatSettingsCreator instance = new ChatSettingsCreator();
 
@@ -227,7 +227,7 @@ public class ChatSettingsCreator {
     private void createImageSettings(JID workgroupJID) {
         PluginManager pluginManager = XMPPServer.getInstance().getPluginManager();
         Plugin fastpathPlugin = pluginManager.getPlugin("fastpath");
-        File fastpathPluginDirectory = pluginManager.getPluginPath(fastpathPlugin).toFile();
+        File fastpathPluginDirectory = pluginManager.getPluginDirectory(fastpathPlugin);
 
         File imagesDir = new File(fastpathPluginDirectory, "web/images");
 
