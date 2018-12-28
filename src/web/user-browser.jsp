@@ -1,6 +1,4 @@
-<%--
---%>
-
+<%@ page contentType="text/html; charset=UTF-8" %>
 <%@ page import="org.jivesoftware.util.ParamUtils,
                  java.util.Iterator,
                  org.jivesoftware.openfire.user.User,

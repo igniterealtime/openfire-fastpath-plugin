@@ -1,7 +1,4 @@
-
-<%--
---%>
-
+<%@ page contentType="text/html; charset=UTF-8" %>
 <%@ page import="org.jivesoftware.xmpp.workgroup.WorkgroupManager,
                  org.jivesoftware.util.*,
                  java.net.URLEncoder,
