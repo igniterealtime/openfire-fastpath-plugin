@@ -1,9 +1,4 @@
-<%--
-
-
-
-
---%>
+<%@ page contentType="text/html; charset=UTF-8" %>
 <%@ page import="org.jivesoftware.xmpp.workgroup.Agent,
                  org.jivesoftware.xmpp.workgroup.AgentSession,
                  org.jivesoftware.xmpp.workgroup.Workgroup,

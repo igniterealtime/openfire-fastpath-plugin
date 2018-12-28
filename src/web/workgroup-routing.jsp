@@ -1,3 +1,4 @@
+<%@ page contentType="text/html; charset=UTF-8" %>
 <%@ page import="org.jivesoftware.xmpp.workgroup.RequestQueue" %>
 <%@ page import="org.jivesoftware.xmpp.workgroup.Workgroup" %>
 <%@ page import="org.jivesoftware.xmpp.workgroup.WorkgroupManager" %>

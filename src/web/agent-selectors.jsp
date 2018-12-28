@@ -14,6 +14,7 @@
   - See the License for the specific language governing permissions and
   - limitations under the License.
 --%>
+<%@ page contentType="text/html; charset=UTF-8" %>
 <% try { %>
 <%@ page import="java.beans.*,
                  org.jivesoftware.xmpp.workgroup.dispatcher.AgentSelector,
