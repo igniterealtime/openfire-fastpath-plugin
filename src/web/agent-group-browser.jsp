@@ -1,9 +1,6 @@
-<%--
---%>
-
-<%@ page
-import="org.jivesoftware.util.ParamUtils,
-                 org.jivesoftware.xmpp.workgroup.WorkgroupManager"%>
+<%@ page contentType="text/html; charset=UTF-8" %>
+<%@ page import="org.jivesoftware.util.ParamUtils" %>
+<%@ page import="org.jivesoftware.xmpp.workgroup.WorkgroupManager"%>
 <%@ page import="org.jivesoftware.openfire.group.GroupManager"%>
 <%@ page import="org.jivesoftware.openfire.group.Group"%>
 

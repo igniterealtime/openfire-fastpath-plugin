@@ -1,6 +1,4 @@
-<%--
---%>
-
+<%@ page contentType="text/html; charset=UTF-8" %>
 <%@ page import="org.jivesoftware.xmpp.workgroup.Workgroup,
                  org.jivesoftware.xmpp.workgroup.WorkgroupManager,
                  org.jivesoftware.xmpp.workgroup.spi.ChatHistoryUtils,
