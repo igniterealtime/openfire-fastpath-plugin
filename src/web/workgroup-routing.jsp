@@ -14,7 +14,7 @@
 <%@ page import="org.jivesoftware.util.NotFoundException,
         org.jivesoftware.openfire.fastpath.dataforms.FormManager,
         org.jivesoftware.openfire.user.UserNotFoundException"%>
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+
 <html>
   <head><title>Workgroup Routing</title></head>
   <body>
