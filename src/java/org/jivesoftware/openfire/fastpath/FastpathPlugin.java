@@ -18,7 +18,7 @@ package org.jivesoftware.openfire.fastpath;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.util.Collection;
+import java.util.*;
 
 import org.jivesoftware.openfire.cluster.ClusterEventListener;
 import org.jivesoftware.openfire.cluster.ClusterManager;
@@ -28,6 +28,7 @@ import org.jivesoftware.openfire.fastpath.util.TaskEngine;
 import org.jivesoftware.openfire.user.UserNameManager;
 import org.jivesoftware.openfire.user.UserNameProvider;
 import org.jivesoftware.openfire.user.UserNotFoundException;
+import org.jivesoftware.openfire.http.HttpBindManager;
 import org.jivesoftware.util.JiveGlobals;
 import org.jivesoftware.xmpp.workgroup.Workgroup;
 import org.jivesoftware.xmpp.workgroup.WorkgroupManager;
@@ -36,6 +37,16 @@ import org.slf4j.LoggerFactory;
 import org.xmpp.component.ComponentException;
 import org.xmpp.component.ComponentManagerFactory;
 import org.xmpp.packet.JID;
+
+import org.eclipse.jetty.apache.jsp.JettyJasperInitializer;
+import org.eclipse.jetty.plus.annotation.ContainerInitializer;
+import org.eclipse.jetty.server.handler.ContextHandlerCollection;
+import org.eclipse.jetty.servlet.*;
+import org.eclipse.jetty.server.Handler;
+import org.eclipse.jetty.webapp.WebAppContext;
+
+import org.apache.tomcat.InstanceManager;
+import org.apache.tomcat.SimpleInstanceManager;
 
 /**
  * Openfire Fastpath plugin.
@@ -50,6 +61,7 @@ public class FastpathPlugin implements Plugin, ClusterEventListener {
      * Keep a reference to Fastpath only when the service is up and running in this JVM.
      */
     private WorkgroupManager workgroupManager;
+    private WebAppContext context;
 
     public void initializePlugin(PluginManager manager, File pluginDirectory) {
         // Check if we Enterprise is installed and stop loading this plugin if found
@@ -74,12 +86,14 @@ public class FastpathPlugin implements Plugin, ClusterEventListener {
         }
 
         workgroupManagerStart();
+        webchatStart(pluginDirectory);
 
         // Listen to cluster events
         ClusterManager.addListener(this);
     }
 
     public void destroyPlugin() {
+        webchatStop();
         workgroupManagerStop();
 
         // Stop listen to cluster events
@@ -133,6 +147,26 @@ public class FastpathPlugin implements Plugin, ClusterEventListener {
         }
         // Clean up the reference to the workgroup manager as a way to say that FP is no longer running in this JVM
         workgroupManager = null;
+    }
+
+    private void webchatStart(File pluginDirectory)
+    {
+        Log.info("start webchat");
+
+        context = new WebAppContext(null, pluginDirectory.getPath() + "/classes", "/webchat");
+        context.setClassLoader(this.getClass().getClassLoader());
+        final List<ContainerInitializer> initializersCRM = new ArrayList<>();
+        initializersCRM.add(new ContainerInitializer(new JettyJasperInitializer(), null));
+        context.setAttribute("org.eclipse.jetty.containerInitializers", initializersCRM);
+        context.setAttribute(InstanceManager.class.getName(), new SimpleInstanceManager());
+        context.setWelcomeFiles(new String[]{"index.jsp"});
+        HttpBindManager.getInstance().addJettyHandler(context);
+    }
+
+    private void webchatStop()
+    {
+        Log.info("stop webchat");
+        HttpBindManager.getInstance().removeJettyHandler(context);
     }
 
     public WorkgroupManager getWorkgroupManager() {
