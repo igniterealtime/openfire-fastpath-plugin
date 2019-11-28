@@ -1,6 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ page import="org.jivesoftware.util.*,
                  java.util.*,
+                 org.jivesoftware.openfire.*,
                  org.jivesoftware.xmpp.workgroup.WorkgroupManager,
                  org.jivesoftware.xmpp.workgroup.Workgroup,
                  org.jivesoftware.xmpp.workgroup.WorkgroupAdminManager,
@@ -10,6 +11,12 @@
    List<InternalModel> pageList = new ArrayList<InternalModel>();
 %>
 <%
+    String hostname = XMPPServer.getInstance().getServerInfo().getHostname();
+    String domain = XMPPServer.getInstance().getServerInfo().getXMPPDomain();    
+    String port = JiveGlobals.getProperty("httpbind.port.secure", "7443");
+    String host = hostname + ":" + port;
+    String url = "https://" + host;
+    
     pageList = new ArrayList<InternalModel>();
 
     // Get parameters
@@ -99,13 +106,20 @@
         <tr valign="middle">
         <td><b>HTML Code</b><br/>
         <span class="jive-description">Copy this HTML Code wherever you would like to place a "Chat with me" button. This code will
-        display the correct presence information for this workgroup by either being online or offline. <i>(You must replace the url to the actual jivelive.jsp page)</i>
+        display the correct presence information for this workgroup by either being online or offline.
     </span>
         </td>
         <td width="60%" style="font-size:11px;">
-       <font color="green">&lt;!-- Insert this snippet where you would like the Chat button image to show up --></font><br/>
-        &lt;script language="JavaScript" type="text/javascript" src="url to jivelive.jsp">&lt;/script><br/>
-        &lt;script>showChatButton('<%= wgID %>');&lt;/script><br/>
+        <font color="green">&lt;!-- Insert this snippet where you would like the Chat button image to show up --></font>
+        <br/>
+        &lt;fastpath-chat
+            hosted="<%= url %>/webchat"
+            domain="<%= domain %>"
+            server="<%= host %>"
+            workgroup="<%= workgroupJID.getNode() %>"&gt;
+        &lt;/fastpath-chat&gt;
+        &lt;script src="<%= url %>/webchat/ofmeet.js">&lt;/script&gt; 
+        <br/>
         <font color="green">&lt;!-- End Of Spark Fastpath Snippet --></font>
         </td>
         </tr>
