@@ -20,4 +20,4 @@ the new fastpath.jar file over the existing file.
 
 Configuration is performed under the <b>Fastpath</b> tab in the Openfire
 admin console.  The legacy quick start guides can be found
-[here](https://discourse.igniterealtime.org/uploads/short-url/hOL4LunuoI3obPEYYgFwIfmeMmt.pdf)
+[here](https://discourse.igniterealtime.org/t/fastpath-quick-start-guides-legacy)
