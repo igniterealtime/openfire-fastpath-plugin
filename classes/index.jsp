@@ -4,7 +4,7 @@
     String domain = XMPPServer.getInstance().getServerInfo().getXMPPDomain();    
     String port = JiveGlobals.getProperty("httpbind.port.secure", "7443");
     String host = hostname + ":" + port;
-    String url = "https://" + host;
+    String url = JiveGlobals.getProperty("fastpath.webchat.url", "https://" + host);       
 %>
 <html>
 <head>
