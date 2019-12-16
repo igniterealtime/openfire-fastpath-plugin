@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.jivesoftware.openfire.*;
 import org.jivesoftware.openfire.fastpath.dataforms.FormElement;
 import org.jivesoftware.openfire.fastpath.dataforms.FormManager;
 import org.jivesoftware.openfire.fastpath.dataforms.WorkgroupForm;
@@ -29,19 +30,21 @@ import org.jivesoftware.openfire.fastpath.settings.chat.ChatSettings;
 import org.jivesoftware.openfire.fastpath.settings.chat.ChatSettingsManager;
 import org.jivesoftware.openfire.fastpath.settings.chat.KeyEnum;
 import org.jivesoftware.util.NotFoundException;
-import org.jivesoftware.xmpp.workgroup.UnauthorizedException;
-import org.jivesoftware.xmpp.workgroup.UserCommunicationMethod;
-import org.jivesoftware.xmpp.workgroup.Workgroup;
+import org.jivesoftware.xmpp.workgroup.*;
 import org.jivesoftware.xmpp.workgroup.interceptor.ChatbotInterceptorManager;
 import org.jivesoftware.xmpp.workgroup.interceptor.InterceptorManager;
 import org.jivesoftware.xmpp.workgroup.interceptor.PacketRejectedException;
 import org.jivesoftware.xmpp.workgroup.interceptor.QueueInterceptorManager;
 import org.jivesoftware.xmpp.workgroup.request.Request;
 import org.jivesoftware.xmpp.workgroup.request.UserRequest;
+import org.jivesoftware.xmpp.workgroup.AgentSession;
+import org.jivesoftware.xmpp.workgroup.Offer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xmpp.packet.JID;
 import org.xmpp.packet.Message;
+import org.xmpp.packet.Presence;
+import org.dom4j.Element;
 
 /**
  * A Chatbot holds a sequence of steps where each step represents an interaction with a
@@ -109,7 +112,10 @@ import org.xmpp.packet.Message;
 public class Chatbot implements UserCommunicationMethod {
 
     private static final Logger Log = LoggerFactory.getLogger(Chatbot.class);
-    
+    private static final MessageRouter MESSAGE_ROUTER = XMPPServer.getInstance().getMessageRouter();
+    private static final PresenceRouter PRESENCE_ROUTER = XMPPServer.getInstance().getPresenceRouter();
+    private static final AgentManager AGENT_MANAGER = WorkgroupManager.getInstance().getAgentManager();
+
     /**
      * Holds the workgroup where the chatbot is working. This is a one-to-one relation so this
      * chatbot is the only chatbot that will be answering Messages sent to the workgroup.
@@ -188,12 +194,12 @@ public class Chatbot implements UserCommunicationMethod {
             session.setMessageThread(message.getThread());
             // Check if the workgroup is opened
             synchronized(session) {
-                if (workgroup.getStatus() != Workgroup.Status.OPEN) {
+                if (handleCommand(message, session)) {
+                    // The sent message executed a command so do nothing
+                }
+                else if (workgroup.getStatus() != Workgroup.Status.OPEN) {
                     // Send message saying that the workgroup is closed/not available
                     sendReply(message, getWorkgroupClosedMessage());
-                }
-                else if (handleCommand(message, session)) {
-                    // The sent message executed a command so do nothing
                 }
                 else if (session.getCurrentStep() < 0) {
                     // Send the welcome message
@@ -365,6 +371,77 @@ public class Chatbot implements UserCommunicationMethod {
         session.setCurrentStep(1);
     }
 
+    private void leaveQueue(Message message, ChatbotSession session) {
+        Presence presence = new Presence();
+        presence.setFrom(message.getFrom());
+        presence.setTo(workgroup.getJID());
+        presence.setType(Presence.Type.unavailable);
+        PRESENCE_ROUTER.route(presence);
+
+        String leaveResponse = getLeaveResponse();
+        leaveResponse = leaveResponse.replace("${workgroup}", workgroup.getJID().toString());
+        sendReply(message, leaveResponse);
+    }
+
+    private void joinQueue(Message message, ChatbotSession session) {
+        Presence presence = new Presence();
+        presence.setFrom(message.getFrom());
+        presence.setTo(workgroup.getJID());
+
+        Element agentStatus = presence.addChildElement("agent-status", "http://jabber.org/protocol/workgroup");
+        agentStatus.addElement("max-chats").setText("7");
+        presence.addChildElement("show", "").setText("chat");
+        presence.addChildElement("priority", "").setText("9");
+        PRESENCE_ROUTER.route(presence);
+
+        String joinResponse = getJoinResponse();
+        joinResponse = joinResponse.replace("${workgroup}", workgroup.getJID().toString());
+        sendReply(message, joinResponse);
+    }
+
+    public void makeOffer(String id, JID to, String jid)
+    {
+        ChatbotSession session = getSession(to, false);
+
+        if (session != null) {
+            session.setOfferId(id);
+            String acceptOfferQuestion = getAcceptOfferQuestion();
+            acceptOfferQuestion = acceptOfferQuestion.replace("${jid}", jid);
+            sendMessage(to, id, acceptOfferQuestion);
+        }
+    }
+
+    private void acceptRejectOffer(ChatbotSession session, Message message, boolean accept)
+    {
+        boolean handled = false;
+        String id = session.getOfferId();
+        JID from = message.getFrom();
+
+        if (id != null) {
+            try {
+                Request request = Request.getRequest(id);
+                Offer offer = request.getOffer();
+
+                if (offer != null && offer.isOutstanding()) {
+                    AgentSession agentSession = AGENT_MANAGER.getAgentSession(from);
+
+                    if (agentSession != null) {
+                        if (accept) offer.accept(agentSession);
+                        if (!accept) offer.reject(agentSession);
+                        handled = true;
+
+                        sendReply(message, getCommandAcceptedMessage());
+                    }
+                }
+            } catch (Exception e) {
+                Log.error("acceptRejectOffer failed", e);
+            }
+        }
+        if (!handled) {
+            sendReply(message, getCommandRejectedMessage());
+        }
+    }
+
     private void sendPreviousQuestion(Message message, ChatbotSession session) {
         if (session.getCurrentSubstep() == 0) {
             sendJoinQuestion(message, session);
@@ -423,6 +500,8 @@ public class Chatbot implements UserCommunicationMethod {
         sendReply(message, getRepeatHelpMessage());
         sendReply(message, getByeHelpMessage());
         sendReply(message, getPositionHelpMessage());
+        sendReply(message, getJoinHelpMessage());
+        sendReply(message, getLeaveHelpMessage());
     }
 
     /**
@@ -555,14 +634,38 @@ public class Chatbot implements UserCommunicationMethod {
      */
     private boolean handleCommand(Message message, ChatbotSession session) {
         String command = message.getBody().trim();
+
         if (getHelpCommand().equalsIgnoreCase(command)) {
             sendHelpMessage(message);
+            return true;
+        }
+        else if (getJoinCommand().equalsIgnoreCase(command)) {
+            joinQueue(message, session);
+            return true;
+        }
+
+        if (workgroup.getStatus() != Workgroup.Status.OPEN) {
+            // Send message saying that the workgroup is closed/not available
+            sendReply(message, getWorkgroupClosedMessage());
+            return true;
+        }
+        else if (getLeaveCommand().equalsIgnoreCase(command)) {
+            leaveQueue(message, session);
             return true;
         }
         else if (getByeCommand().equalsIgnoreCase(command)) {
             userDepartQueue(message);
             return true;
         }
+        else if (getAcceptCommand().equalsIgnoreCase(command)) {
+            acceptRejectOffer(session, message, true);
+            return true;
+        }
+        else if (getRejectCommand().equalsIgnoreCase(command)) {
+            acceptRejectOffer(session, message, false);
+            return true;
+        }
+
         if (session.getCurrentStep() == 1) {
             if (getRepeatCommand().equalsIgnoreCase(command)) {
                 // Send the join question
@@ -750,6 +853,24 @@ public class Chatbot implements UserCommunicationMethod {
     }
 
     /**
+     *  Returns the response to send to the agent joining the workgroup.
+     *
+     * @return the response to send to the agent joining the workgroup.
+     */
+    private String getJoinResponse() {
+        return settings.getChatSetting(KeyEnum.join_response).getValue();
+    }
+
+    /**
+     *  Returns the response to send to the agent leaving the workgroup.
+     *
+     * @return the response to send to the agent leaving the workgroup.
+     */
+    private String getLeaveResponse() {
+        return settings.getChatSetting(KeyEnum.leave_response).getValue();
+    }
+
+    /**
      *  Returns the question to send to the user asking if he wants to join the workgroup.
      *
      * @return the question to send to the user asking if he wants to join the workgroup.
@@ -871,6 +992,33 @@ public class Chatbot implements UserCommunicationMethod {
     }
 
     /**
+     * Returns the message to send to the user asking if he wants to accept an offer
+     *
+     * @return the message to send to the user asking if he wants to accept an offer
+     */
+    private String getAcceptOfferQuestion() {
+        return settings.getChatSetting(KeyEnum.accept_offer_question).getValue();
+    }
+
+    /**
+     * Returns the message to send to the user informing command was accepted
+     *
+     * @return the message to send to the user informing command was accepted
+     */
+    private String getCommandAcceptedMessage() {
+        return settings.getChatSetting(KeyEnum.command_accepted_message).getValue();
+    }
+
+    /**
+     * Returns the message to send to the user informing command was rejected
+     *
+     * @return the message to send to the user informing command was rejected
+     */
+    private String getCommandRejectedMessage() {
+        return settings.getChatSetting(KeyEnum.command_rejected_message).getValue();
+    }
+
+    /**
      * Returns the message to send to the user asking if he wants to receive again the room
      * invitation.
      *
@@ -909,6 +1057,24 @@ public class Chatbot implements UserCommunicationMethod {
      */
     private String getEmailSentMessage() {
         return settings.getChatSetting(KeyEnum.email_sent_message).getValue();
+    }
+
+    /**
+     * Returns the message that describes the effect of running the <b>leave</b> command.
+     *
+     * @return the message that describes the effect of running the <b>leave</b> command.
+     */
+    private String getLeaveHelpMessage() {
+        return settings.getChatSetting(KeyEnum.leave_help_message).getValue();
+    }
+
+    /**
+     * Returns the message that describes the effect of running the <b>join</b> command.
+     *
+     * @return the message that describes the effect of running the <b>join</b> command.
+     */
+    private String getJoinHelpMessage() {
+        return settings.getChatSetting(KeyEnum.join_help_message).getValue();
     }
 
     /**
@@ -984,6 +1150,41 @@ public class Chatbot implements UserCommunicationMethod {
      */
     private String getHelpCommand() {
         return settings.getChatSetting(KeyEnum.help_command).getValue();
+    }
+
+    /**
+     * Returns the string that indicates that the agent user is joining a queue
+     *
+     * @return the string that indicates that the the agent user is joining a queue
+     */
+    private String getJoinCommand() {
+        return settings.getChatSetting(KeyEnum.join_command).getValue();
+    }
+
+    /**
+     * Returns the string that indicates that the agent user is leaving a queue
+     *
+     * @return the string that indicates that the the agent user is leaving a queue
+     */
+    private String getLeaveCommand() {
+        return settings.getChatSetting(KeyEnum.leave_command).getValue();
+    }
+    /**
+     * Returns the string that indicates that the agent user is rejecting last offer
+     *
+     * @return the string that indicates that the agent user is rejecting last offer
+     */
+    private String getRejectCommand() {
+        return settings.getChatSetting(KeyEnum.reject_command).getValue();
+    }
+
+    /**
+     * Returns the string that indicates that the agent user is accepting last offer
+     *
+     * @return the string that indicates that the agent user is accepting last offer
+     */
+    private String getAcceptCommand() {
+        return settings.getChatSetting(KeyEnum.accept_command).getValue();
     }
 
     /**
