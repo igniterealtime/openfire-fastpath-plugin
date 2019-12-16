@@ -99,6 +99,11 @@ public class ChatbotSession {
     private UserRequest request;
 
     /**
+     * The ID of the offer made to an agent user
+     */
+    private String offerId;
+
+    /**
      * Creates a new session for the specified user.
      *
      * @param user the user that initiated a chat with the workgroup.
@@ -231,11 +236,29 @@ public class ChatbotSession {
 
     /**
      * Returns the generated request for the user to join the queue or <tt>null</tt> if the user
-     * haven't completed the whole form. 
+     * haven't completed the whole form.
      *
      * @return the generated request for the user to join the queue.
      */
     public UserRequest getRequest() {
         return request;
+    }
+
+    /**
+     * Sets the agent user current offer id.
+     *
+     * @param offerId the agent user current offer id.
+     */
+    public void setOfferId(String offerId) {
+        this.offerId = offerId;
+    }
+
+    /**
+     * Returns the agent user current offer id
+     *
+     * @return the agent user current offer id.
+     */
+    public String getOfferId() {
+        return offerId;
     }
 }
