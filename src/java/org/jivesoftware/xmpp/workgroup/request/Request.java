@@ -36,6 +36,7 @@ import org.jivesoftware.xmpp.workgroup.Offer;
 import org.jivesoftware.xmpp.workgroup.RequestQueue;
 import org.jivesoftware.xmpp.workgroup.Workgroup;
 import org.jivesoftware.xmpp.workgroup.utils.FastpathConstants;
+import org.jivesoftware.xmpp.workgroup.chatbot.Chatbot;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xmpp.packet.IQ;
@@ -49,7 +50,7 @@ import org.xmpp.packet.JID;
 public abstract class Request {
 
     private static final Logger Log = LoggerFactory.getLogger(Request.class);
-    
+
     private static final Map<String, Request> requests = new ConcurrentHashMap<String, Request>();
 
     protected final String requestID;
@@ -198,7 +199,7 @@ public abstract class Request {
 
     /**
      * Notification event indicating that an agent has accepted the offer. Subclasses should
-     * react accordingly (e.g. create a room and send invitations to agent and user that made the request). 
+     * react accordingly (e.g. create a room and send invitations to agent and user that made the request).
      *
      * @param agentSession the agent that previously accepted the offer.
      */
@@ -237,6 +238,8 @@ public abstract class Request {
 
         offerElement.add(getSessionElement());
         addOfferContent(offerElement);
+
+        queue.getWorkgroup().getChatBot().makeOffer(requestID, session.getJID(), getUserJID().toString());
         return session.sendOffer(offer, offerPacket);
     }
 

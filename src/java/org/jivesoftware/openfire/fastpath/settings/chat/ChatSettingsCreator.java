@@ -130,6 +130,9 @@ public class ChatSettingsCreator {
         botMap.put(KeyEnum.join_question, "Would you like to join the chat, yes or no?");
         labelMap.put(KeyEnum.join_question, "Join question");
 
+        botMap.put(KeyEnum.accept_offer_question, "Would you like to accept a chat offer from ${jid}? Type command !accept or !reject");
+        labelMap.put(KeyEnum.accept_offer_question, "Accept an offer");
+
         botMap.put(KeyEnum.bye_message, "Thanks for coming. We hope to see you soon again.");
         labelMap.put(KeyEnum.bye_message, "User is leaving");
 
@@ -175,6 +178,30 @@ public class ChatSettingsCreator {
         botMap.put(KeyEnum.email_sent_message, "Transcript sent to the following email address ${email}");
         labelMap.put(KeyEnum.email_sent_message, "Email was sent to the user");
 
+        botMap.put(KeyEnum.command_accepted_message, "Please stand by for group chat invitation");
+        labelMap.put(KeyEnum.command_accepted_message, "Comand ok response");
+
+        botMap.put(KeyEnum.command_rejected_message, "Command refused");
+        labelMap.put(KeyEnum.command_rejected_message, "Comand error response");
+
+        botMap.put(KeyEnum.join_command, "!join");
+        labelMap.put(KeyEnum.join_command, "Text representing the 'join' command");
+
+        botMap.put(KeyEnum.leave_command, "!leave");
+        labelMap.put(KeyEnum.leave_command, "Text representing the 'leave' command");
+
+        botMap.put(KeyEnum.accept_command, "!accept");
+        labelMap.put(KeyEnum.accept_command, "Text representing the 'accept' command");
+
+        botMap.put(KeyEnum.reject_command, "!reject");
+        labelMap.put(KeyEnum.reject_command, "Text representing the 'reject' command");
+
+        botMap.put(KeyEnum.join_response, "You have joined '${workgroup}' group queue");
+        labelMap.put(KeyEnum.join_response, "Agent join response");
+
+        botMap.put(KeyEnum.leave_response, "You have left '${workgroup}' group queue");
+        labelMap.put(KeyEnum.leave_response, "Agent left response");
+
         botMap.put(KeyEnum.back_command, "!back");
         labelMap.put(KeyEnum.back_command, "Text representing the 'back' command");
 
@@ -189,6 +216,12 @@ public class ChatSettingsCreator {
 
         botMap.put(KeyEnum.repeat_command, "!repeat");
         labelMap.put(KeyEnum.repeat_command, "Text representing the 'repeat' command");
+
+        botMap.put(KeyEnum.join_help_message, "!join - Use this command to join the work queue as an agent.");
+        labelMap.put(KeyEnum.join_help_message, "Description of the 'join' command");
+
+        botMap.put(KeyEnum.leave_help_message, "!leave - Use this command to leave the work queue as an agent.");
+        labelMap.put(KeyEnum.leave_help_message, "Description of the 'leave' command");
 
         botMap.put(KeyEnum.back_help_message, "!back - Use this command to return to the previous step.");
         labelMap.put(KeyEnum.back_help_message, "Description of the 'back' command");
@@ -249,7 +282,7 @@ public class ChatSettingsCreator {
                     bytes = new byte[(int)image.length()];
                     int read = stream.read(bytes);
                     if (read != bytes.length) {
-                        throw new IOException("Failed to read all image bytes."); 
+                        throw new IOException("Failed to read all image bytes.");
                     }
                     stream.close();
                     final String encodedFile = StringUtils.encodeBase64(bytes);
