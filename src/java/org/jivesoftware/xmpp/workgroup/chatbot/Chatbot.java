@@ -524,8 +524,12 @@ public class Chatbot implements UserCommunicationMethod {
         sendReply(message, getRepeatHelpMessage());
         sendReply(message, getByeHelpMessage());
         sendReply(message, getPositionHelpMessage());
-        sendReply(message, getJoinHelpMessage());
-        sendReply(message, getLeaveHelpMessage());
+
+        if (workgroup.getAgentManager().hasAgent(message.getFrom()))
+        {
+            sendReply(message, getJoinHelpMessage());
+            sendReply(message, getLeaveHelpMessage());
+        }
     }
 
     /**
@@ -663,7 +667,7 @@ public class Chatbot implements UserCommunicationMethod {
             sendHelpMessage(message);
             return true;
         }
-        else if (getJoinCommand().equalsIgnoreCase(command)) {
+        else if (getJoinCommand().equalsIgnoreCase(command) && workgroup.getAgentManager().hasAgent(message.getFrom())) {
             joinQueue(message, session);
             return true;
         }
@@ -673,7 +677,7 @@ public class Chatbot implements UserCommunicationMethod {
             sendReply(message, getWorkgroupClosedMessage());
             return true;
         }
-        else if (getLeaveCommand().equalsIgnoreCase(command)) {
+        else if (getLeaveCommand().equalsIgnoreCase(command) && workgroup.getAgentManager().hasAgent(message.getFrom())) {
             leaveQueue(message, session);
             return true;
         }
