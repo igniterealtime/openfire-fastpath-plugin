@@ -80,6 +80,8 @@ import org.dom4j.Element;
  *  <li><b>step = 7</b> - The user wants to get the transcript by email but hasn't specified an
  *  email address so ask him to enter an email address and then send the chat transcript by
  *  email.</li>
+ *  <li><b>step = 100</b> - A user agent is ready to accept an offer.</li>
+ *  <li><b>step = 101</b> - A chat offer was sent to the agent user and an answer is expected.</li>
  * </ol>
  *
  * The Chatbot allows the user to execute commands. Commands may help the user go back to
@@ -206,6 +208,21 @@ public class Chatbot implements UserCommunicationMethod {
                     sendWelcomeMessage(message);
                     // Send the join question
                     sendJoinQuestion(message, session);
+                }
+                else if (session.getCurrentStep() == 101) {
+                    // User Agent is answering accept offer
+                    if (yes.equalsIgnoreCase(message.getBody().trim())) {
+                        // User Agent accepts offer
+                        acceptRejectOffer(session, message, true);
+                    }
+                    else if (no.equalsIgnoreCase(message.getBody().trim())) {
+                        // User Agent rejects offer
+                        acceptRejectOffer(session, message, false);
+                    }
+                    else {
+                        // User Agent sent an unknown answer so repeat the offer question
+                        sendMessage(session.getUserJID(), session.getOfferId(), session.getOfferQuestion());
+                    }
                 }
                 else if (session.getCurrentStep() == 1) {
                     // User is answering join question
@@ -381,6 +398,8 @@ public class Chatbot implements UserCommunicationMethod {
         String leaveResponse = getLeaveResponse();
         leaveResponse = leaveResponse.replace("${workgroup}", workgroup.getJID().toString());
         sendReply(message, leaveResponse);
+
+        session.setCurrentStep(-1);
     }
 
     private void joinQueue(Message message, ChatbotSession session) {
@@ -397,6 +416,7 @@ public class Chatbot implements UserCommunicationMethod {
         String joinResponse = getJoinResponse();
         joinResponse = joinResponse.replace("${workgroup}", workgroup.getJID().toString());
         sendReply(message, joinResponse);
+        session.setCurrentStep(100);
     }
 
     public void makeOffer(String id, JID to, String jid)
@@ -408,6 +428,8 @@ public class Chatbot implements UserCommunicationMethod {
             String acceptOfferQuestion = getAcceptOfferQuestion();
             acceptOfferQuestion = acceptOfferQuestion.replace("${jid}", jid);
             sendMessage(to, id, acceptOfferQuestion);
+            session.setCurrentStep(101);
+            session.setOfferQuestion(acceptOfferQuestion);
         }
     }
 
@@ -440,6 +462,8 @@ public class Chatbot implements UserCommunicationMethod {
         if (!handled) {
             sendReply(message, getCommandRejectedMessage());
         }
+
+        session.setCurrentStep(100);
     }
 
     private void sendPreviousQuestion(Message message, ChatbotSession session) {
@@ -655,14 +679,6 @@ public class Chatbot implements UserCommunicationMethod {
         }
         else if (getByeCommand().equalsIgnoreCase(command)) {
             userDepartQueue(message);
-            return true;
-        }
-        else if (getAcceptCommand().equalsIgnoreCase(command)) {
-            acceptRejectOffer(session, message, true);
-            return true;
-        }
-        else if (getRejectCommand().equalsIgnoreCase(command)) {
-            acceptRejectOffer(session, message, false);
             return true;
         }
 
@@ -1168,23 +1184,6 @@ public class Chatbot implements UserCommunicationMethod {
      */
     private String getLeaveCommand() {
         return settings.getChatSetting(KeyEnum.leave_command).getValue();
-    }
-    /**
-     * Returns the string that indicates that the agent user is rejecting last offer
-     *
-     * @return the string that indicates that the agent user is rejecting last offer
-     */
-    private String getRejectCommand() {
-        return settings.getChatSetting(KeyEnum.reject_command).getValue();
-    }
-
-    /**
-     * Returns the string that indicates that the agent user is accepting last offer
-     *
-     * @return the string that indicates that the agent user is accepting last offer
-     */
-    private String getAcceptCommand() {
-        return settings.getChatSetting(KeyEnum.accept_command).getValue();
     }
 
     /**
