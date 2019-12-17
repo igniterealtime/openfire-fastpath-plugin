@@ -130,7 +130,7 @@ public class ChatSettingsCreator {
         botMap.put(KeyEnum.join_question, "Would you like to join the chat, yes or no?");
         labelMap.put(KeyEnum.join_question, "Join question");
 
-        botMap.put(KeyEnum.accept_offer_question, "Would you like to accept a chat offer from ${jid}? Type command !accept or !reject");
+        botMap.put(KeyEnum.accept_offer_question, "Would you like to accept a chat offer from ${jid}, yes or no?");
         labelMap.put(KeyEnum.accept_offer_question, "Accept an offer");
 
         botMap.put(KeyEnum.bye_message, "Thanks for coming. We hope to see you soon again.");
@@ -189,12 +189,6 @@ public class ChatSettingsCreator {
 
         botMap.put(KeyEnum.leave_command, "!leave");
         labelMap.put(KeyEnum.leave_command, "Text representing the 'leave' command");
-
-        botMap.put(KeyEnum.accept_command, "!accept");
-        labelMap.put(KeyEnum.accept_command, "Text representing the 'accept' command");
-
-        botMap.put(KeyEnum.reject_command, "!reject");
-        labelMap.put(KeyEnum.reject_command, "Text representing the 'reject' command");
 
         botMap.put(KeyEnum.join_response, "You have joined '${workgroup}' group queue");
         labelMap.put(KeyEnum.join_response, "Agent join response");

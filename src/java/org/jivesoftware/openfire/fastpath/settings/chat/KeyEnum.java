@@ -83,8 +83,6 @@ public enum KeyEnum {
     email_sent_message("email_sent_message"),
     join_command("join_command"),
     leave_command("leave_command"),
-    reject_command("reject_command"),
-    accept_command("accept_command"),
     back_command("back_command"),
     bye_command("bye_command"),
     help_command("help_command"),
