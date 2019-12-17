@@ -104,6 +104,11 @@ public class ChatbotSession {
     private String offerId;
 
     /**
+     * The text of the offer made to an agent user
+     */
+    private String acceptOfferQuestion;
+
+    /**
      * Creates a new session for the specified user.
      *
      * @param user the user that initiated a chat with the workgroup.
@@ -261,4 +266,23 @@ public class ChatbotSession {
     public String getOfferId() {
         return offerId;
     }
+
+    /**
+     * Sets the agent user current offer question.
+     *
+     * @param offerId the agent user current offer question.
+     */
+    public void setOfferQuestion(String acceptOfferQuestion) {
+        this.acceptOfferQuestion = acceptOfferQuestion;
+    }
+
+    /**
+     * Returns the agent user current offer question
+     *
+     * @return the agent user current offer question.
+     */
+    public String getOfferQuestion() {
+        return acceptOfferQuestion;
+    }
+
 }
