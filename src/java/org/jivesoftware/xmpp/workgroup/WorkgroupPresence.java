@@ -61,7 +61,7 @@ import org.xmpp.packet.Presence;
 public class WorkgroupPresence {
 
     private static final Logger Log = LoggerFactory.getLogger(WorkgroupPresence.class);
-    
+
     private static final FastDateFormat UTC_FORMAT = FastDateFormat
             .getInstance(XMPPDateTimeFormat.XMPP_DELAY_DATETIME_FORMAT, TimeZone.getTimeZone("UTC"));
 
@@ -115,6 +115,17 @@ public class WorkgroupPresence {
                 reply.setFrom(workgroup.getJID());
                 reply.setType(Presence.Type.subscribed);
                 workgroup.send(reply);
+
+                // for user agent, send subecribe for both ways
+                if (workgroup.getAgentManager().hasAgent(sender))
+                {
+                    Presence presence = new Presence();
+                    presence.setTo(sender);
+                    presence.setFrom(workgroup.getJID());
+                    presence.setType(Presence.Type.subscribe);
+                    workgroup.send(presence);
+                }
+
                 // Send the presence of the workgroup to the user that requested it
                 sendPresence(packet.getFrom());
             }
