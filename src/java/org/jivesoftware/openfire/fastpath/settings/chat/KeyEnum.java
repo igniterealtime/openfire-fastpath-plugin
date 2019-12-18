@@ -64,6 +64,7 @@ public enum KeyEnum {
     welcome_message("welcome_message"),
     join_question("join_question"),
     accept_offer_question("accept_offer_question"),
+    revoke_message("revoke_message"),
     join_response("join_response"),
     leave_response("leave_response"),
     bye_message("bye_message"),

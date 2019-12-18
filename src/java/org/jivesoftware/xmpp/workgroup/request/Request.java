@@ -262,6 +262,7 @@ public abstract class Request {
         revoke.add(getSessionElement());
         addRevokeContent(revoke);
 
+        queue.getWorkgroup().getChatBot().sendRevoke(requestID, session.getJID(), getUserJID().toString());
         session.sendRevoke(offer, agentRevoke);
     }
 
