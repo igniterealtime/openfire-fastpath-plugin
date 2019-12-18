@@ -130,6 +130,9 @@ public class ChatSettingsCreator {
         botMap.put(KeyEnum.join_question, "Would you like to join the chat, yes or no?");
         labelMap.put(KeyEnum.join_question, "Join question");
 
+        botMap.put(KeyEnum.revoke_message, "Time out. Offer has been revoked");
+        labelMap.put(KeyEnum.revoke_message, "Offer is revoked");
+
         botMap.put(KeyEnum.accept_offer_question, "Would you like to accept a chat offer from ${jid}, yes or no?");
         labelMap.put(KeyEnum.accept_offer_question, "Accept an offer");
 
