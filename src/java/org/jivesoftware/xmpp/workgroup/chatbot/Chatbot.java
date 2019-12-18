@@ -419,6 +419,16 @@ public class Chatbot implements UserCommunicationMethod {
         session.setCurrentStep(100);
     }
 
+    public void sendRevoke(String id, JID to, String jid)
+    {
+        ChatbotSession session = getSession(to, false);
+
+        if (session != null) {
+            sendMessage(to, id, getRevokeMessage());
+            session.setCurrentStep(100);
+        }
+    }
+
     public void makeOffer(String id, JID to, String jid)
     {
         ChatbotSession session = getSession(to, false);
@@ -1009,6 +1019,15 @@ public class Chatbot implements UserCommunicationMethod {
      */
     private String getInvitationSentMessage() {
         return settings.getChatSetting(KeyEnum.invitation_sent_message).getValue();
+    }
+
+    /**
+     * Returns the message to send to the user informing him that offer has been revoked
+     *
+     * @return the message to send to the user informing him that offer has been revoked
+     */
+    private String getRevokeMessage() {
+        return settings.getChatSetting(KeyEnum.revoke_message).getValue();
     }
 
     /**
