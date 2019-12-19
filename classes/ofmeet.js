@@ -106,7 +106,7 @@ var ofmeet = (function(of)
                     _converse.api.chats.open(fastpath);
                 }
                 else {
-                    joinWorkgroup();
+                    joinWorkgroup({});
                 }
 
             }
@@ -116,9 +116,8 @@ var ofmeet = (function(of)
         });
     }
 
-    function joinWorkgroup()
+    function joinWorkgroup(form)
     {
-        const form = {};
         let iq = converse.env.$iq({to: fastpath, type: 'set'}).c('join-queue', {xmlns: 'http://jabber.org/protocol/workgroup'});
         iq.c('queue-notifications').up();
         iq.c('x', {xmlns: 'jabber:x:data', type: 'submit'});
@@ -484,71 +483,8 @@ var ofmeet = (function(of)
 
                 _converse.api.listen.on('connected', function()
                 {
-                    console.debug('irma connected');
-
+                    console.debug('webmeet connected');
                     openFastPath();
-
-                    var qrcodeDialog = null;
-
-                    var userCancelled = function(token)
-                    {
-                        const url = "https://" + server + "/irmaproxy/session/" + token;
-
-                        fetch(url, {method: "DELETE"}).then(function(response){ return response.text()}).then(function(response)
-                        {
-                            console.log('irma/cancel ok', response);
-
-                        }).catch(function (err) {
-                            console.error('irma/cancel error', err);
-                        });
-                    }
-
-                    _converse.connection.addHandler(function(message)
-                    {
-                        console.debug('irma handler', message);
-
-                        const irmaTag = message.querySelector('irma');
-
-                        if (irmaTag)
-                        {
-                            const action = irmaTag.getAttribute('action');
-                            console.debug("irma/reveal", action, irmaTag);
-
-                            if (action == "reveal")
-                            {
-                                const pkg = JSON.parse(irmaTag.innerHTML);
-
-                                irma.handleSession(pkg.sessionPtr, {server: "https://" + server + "/irmaproxy", token: pkg.token, method: 'url'}).then(result =>
-                                {
-                                    console.debug("irma/result", result);
-
-                                    qrcodeDialog = new QRCodeDialog({'model': new converse.env.Backbone.Model({title: 'IRMA Verification', callback: userCancelled, qrcode: result, token: pkg.token}) });
-                                    qrcodeDialog.show();
-                                });
-                            }
-                            else
-
-                            if (action == "status")
-                            {
-                                console.debug("irma/status", irmaTag.innerHTML);
-                            }
-                            else
-
-                            if (action == "done")
-                            {
-                                const payload = JSON.parse(irmaTag.innerHTML);
-                                console.debug("irma/done", payload);
-
-                                if (qrcodeDialog) qrcodeDialog.modal.hide();
-                                if (of.view) of.view.showHelpMessages(["Email: " + payload.disclosed[0][0].rawvalue + " verified", "Phone: " + payload.disclosed[1][0].rawvalue + " verified"]);
-                            }
-
-                        }
-
-                        return true;
-
-                    }, "http://igniterealtime.org/xmlns/xmpp/irma", 'message');
-
                 });
 
                 _converse.api.listen.on('chatRoomOpened', function (view)
@@ -942,8 +878,12 @@ var ofmeet = (function(of)
     of.doExit = function doExit()
     {
         document.getElementById("chatbutton").style.visibility = "visible";
-
         of.doBadge(0);
+    }
+
+    of.joinWorkgroupQueue = function joinWorkgroupQueue(form)
+    {
+        joinWorkgroup(form);
     }
 
     of.loaded = false;
@@ -963,10 +903,6 @@ var ofmeet = (function(of)
     document.body.appendChild(root);
 
     loadCSS('ofmeet.css');
-
-    loadJS('widget/irma/vendors~jwt.js');
-    loadJS('widget/irma/irma.js');
-
     loadCSS('widget/converse.css');
     loadCSS('widget/stylesheets/concord.css');
     loadJS('widget/converse.js');
