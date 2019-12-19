@@ -4,7 +4,9 @@
     String domain = XMPPServer.getInstance().getServerInfo().getXMPPDomain();    
     String port = JiveGlobals.getProperty("httpbind.port.secure", "7443");
     String host = hostname + ":" + port;
-    String url = JiveGlobals.getProperty("fastpath.webchat.url", "https://" + host);       
+    String url = JiveGlobals.getProperty("fastpath.webchat.url", "https://" + host);    
+    String workgroup = request.getParameter("wg") != null ? request.getParameter("wg") : "demo";
+    
 %>
 <html>
 <head>
@@ -126,7 +128,7 @@
         hosted="<%= url %>/webchat"
         domain="<%= domain %>"
         server="<%= host %>"
-        workgroup="demo">
+        workgroup="<%= workgroup %>">
     </fastpath-chat>
     <script src="<%= url %>/webchat/ofmeet.js"></script>
 </body>
