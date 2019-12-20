@@ -24,63 +24,79 @@ admin console.  The legacy quick start guides can be found
 
 ## Quick Setup
 
-1. Create a group in Openfire for each website agent list. Add to each group, all users that will act as agents/experts that will handle chat requests from visitors. For example, add user another_agent to demo_agents shared group.
+### Step 1
+Create a group in Openfire for each website agent list. Add to each group, all users that will act as agents/experts that will handle chat requests from visitors. For example, add user another_agent to demo_agents shared group.
 
 <img src="https://igniterealtime.github.io/openfire-fastpath-plugin/screenshots/screen1.png" />
 
-2. Create another group in Openfire for each website workgroup. This time add only the XMPP address of the workgroup chatbot as the single user. For example, add chatbot demo@workgroup.your_server.chat to demo_workgroup shared group.
+### Step 2
+Create another group in Openfire for each website workgroup. This time add only the XMPP address of the workgroup chatbot as the single user. For example, add chatbot demo@workgroup.your_server.chat to demo_workgroup shared group.
 
 <img src="https://igniterealtime.github.io/openfire-fastpath-plugin/screenshots/screen2.png" /> 
 
-3. In Openfire, create a workgroup for each website preferably using the same name as the website. For example, the XMPP address of demo will be demo@workgroup.your_server.chat.
+### Step 3
+In Openfire, create a workgroup for each website preferably using the same name as the website. For example, the XMPP address of demo will be demo@workgroup.your_server.chat.
 
 <img src="https://igniterealtime.github.io/openfire-fastpath-plugin/screenshots/screen3.png" /> 
 
-4. Assign the group created in step 1 to the default queue of each corresponding workgroup created in step 3.
+### Step 4
+Assign the group created in step 1 to the default queue of each corresponding workgroup created in step 3.
 
 <img src="https://igniterealtime.github.io/openfire-fastpath-plugin/screenshots/screen4.png" /> 
 
-5. In Openfire, go to Contact List Sharing, enable contact list group sharing with the group created in Step 2 with the group ceated in Step 1. For example, goto https://your_server.chat:9091/group-edit.jsp?group=demo_workgroup and enable sharing with group demo_agents.
+### Step 5
+In Openfire, go to Contact List Sharing, enable contact list group sharing with the group created in Step 2 with the group ceated in Step 1. For example, goto https://your_server.chat:9091/group-edit.jsp?group=demo_workgroup and enable sharing with group demo_agents.
 
 <img src="https://igniterealtime.github.io/openfire-fastpath-plugin/screenshots/screen5.png" /> 
 
-6. Go the User Roster of any your_server.chat user added to any of the groups and confirm that it shows all peer agents/experts as well as workgroups as contacts.
+### Step 6
+Go the User Roster of any your_server.chat user added to any of the groups and confirm that it shows all peer agents/experts as well as workgroups as contacts.
 
 <img src="https://igniterealtime.github.io/openfire-fastpath-plugin/screenshots/screen6.png" /> 
 
-7. Go the Web Chat Text Settings for each workgroup and copy the generated HTML for each website and paste into every page where the chat button is required.
+### Step 7
+Go the Web Chat Text Settings for each workgroup and copy the generated HTML for each website and paste into every page where the chat button is required.
 
 <img src="https://igniterealtime.github.io/openfire-fastpath-plugin/screenshots/screen7.png" /> 
 
-8. Login as an agent by using any XMPP client of choice. Try inVerse plugin for web client or Conversations for mobile client.
+### Step 8
+Login as an agent by using any XMPP client of choice. Try inVerse plugin for web client or Conversations for mobile client.
 
 <img src="https://igniterealtime.github.io/openfire-fastpath-plugin/screenshots/screen8.png" /> 
 
-9. The workgroup chatbots should be visible in the contact list. Select any one like demo for example. Type in "!help" to see a list of commands and then type "!join" to join the workgroup queue.
+### Step 9
+The workgroup chatbots should be visible in the contact list. Select any one like demo for example. Type in "!help" to see a list of commands and then type "!join" to join the workgroup queue.
 
 <img src="https://igniterealtime.github.io/openfire-fastpath-plugin/screenshots/screen9.png" /> 
 
-10. Check Openfire Workgroup Summary admin web page to confirm that the workgroup queue is open with 1 member. 
+### Step 10
+Check Openfire Workgroup Summary admin web page to confirm that the workgroup queue is open with 1 member. 
 
 <img src="https://igniterealtime.github.io/openfire-fastpath-plugin/screenshots/screen10.png" /> 
 
-11. Open a web page modifed in step 7 with the chat button. If there is none available try the demo test page at https://your_server.chat:7443/webchat/?wg=demo for example
+### Step 11
+Open a web page modifed in step 7 with the chat button. If there is none available try the demo test page at https://your_server.chat:7443/webchat/?wg=demo for example
 
 <img src="https://igniterealtime.github.io/openfire-fastpath-plugin/screenshots/screen11.png" /> 
 
-12. Click on the yellow chat button. It should start spinning.
+### Step 12
+Click on the yellow chat button. It should start spinning.
 
 <img src="https://igniterealtime.github.io/openfire-fastpath-plugin/screenshots/screen12.png" /> 
 
-13. The chatbot should display a chat offer to the agent user a chat. Type "yes" to accept.
+### Step 13
+The chatbot should display a chat offer to the agent user a chat. Type "yes" to accept.
 
 <img src="https://igniterealtime.github.io/openfire-fastpath-plugin/screenshots/screen13.png" /> 
 
-14. Accept the chat room invitation to start a group chat for the user agent.
+### Step 14
+Accept the chat room invitation to start a group chat for the user agent.
 
 <img src="https://igniterealtime.github.io/openfire-fastpath-plugin/screenshots/screen14.png" /> 
+<br/>
 <img src="https://igniterealtime.github.io/openfire-fastpath-plugin/screenshots/screen15.png" /> 
 
+### Step 15
 15. The web site visitor will auto join.
 
 <img src="https://igniterealtime.github.io/openfire-fastpath-plugin/screenshots/screen16.png" /> 
