@@ -18,6 +18,9 @@ package org.jivesoftware.xmpp.workgroup;
 
 import org.jivesoftware.openfire.group.Group;
 import org.jivesoftware.util.WebManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xmpp.packet.JID;
 
 import java.util.Collection;
 import java.util.Comparator;
@@ -26,6 +29,9 @@ import java.util.Map;
 import java.util.TreeSet;
 
 public class WorkgroupAdminManager extends WebManager {
+
+    private static final Logger Log = LoggerFactory.getLogger(WorkgroupAdminManager.class);
+
     private int range = 15;
 
     public WorkgroupAdminManager() {
@@ -77,8 +83,17 @@ public class WorkgroupAdminManager extends WebManager {
     public Collection<Agent> getAgentsInWorkgroup(Workgroup workgroup) {
         TreeSet<Agent> agents = new TreeSet<Agent>(new AgentAddressComparator());
         for (RequestQueue requestQueue : workgroup.getRequestQueues()) {
-            for (Agent member : requestQueue.getMembers()) {
-                agents.add(member);
+            agents.addAll(requestQueue.getMembers());
+
+            for (Group group : requestQueue.getGroups()) {
+                for(JID agentAddress : group.getMembers()) {
+                    try {
+                        Agent agent = workgroup.getAgentManager().getAgent(agentAddress);
+                        agents.add(agent);
+                    } catch (AgentNotFoundException e) {
+                        Log.warn("Unable to load agent '{}' from group '{}' of queue '{}' in workgroup '{}'", new Object[] {agentAddress, group, requestQueue.getAddress(), workgroup.getFullJID() });
+                    }
+                }
             }
         }
         return agents;
