@@ -240,7 +240,7 @@ public class Agent {
 
     public void setAgentJID(JID agentJID) {
         // Do nothing if setting the same old value
-        if (agentJID != null && agentJID.equals(agentJID)) {
+        if (agentJID != null && agentJID.equals(this.agentJID)) {
             return;
         }
         // Set the new value
