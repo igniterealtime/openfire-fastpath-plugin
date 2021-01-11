@@ -127,6 +127,7 @@ public class RoundRobinDispatcher implements Dispatcher, AgentSessionListener {
         }
     }
 
+    @Override
     public void injectRequest(Request request) {
         // Create a new Offer for the request and add it to the list of active offers
         final Offer offer = new Offer(request, queue, getAgentRejectionTimeout());
@@ -467,12 +468,14 @@ public class RoundRobinDispatcher implements Dispatcher, AgentSessionListener {
         return JiveGlobals.getIntProperty("xmpp.live.rejection.timeout", 20000);
     }
 
+    @Override
     public void notifySessionAdded(AgentSession session) {
         if (!agentList.contains(session)) {
             agentList.add(session);
         }
     }
 
+    @Override
     public void notifySessionRemoved(AgentSession session) {
         agentList.remove(session);
         for (Offer offer : offers) {
@@ -480,10 +483,12 @@ public class RoundRobinDispatcher implements Dispatcher, AgentSessionListener {
         }
     }
 
+    @Override
     public DispatcherInfo getDispatcherInfo() {
         return info;
     }
 
+    @Override
     public void setDispatcherInfo(DispatcherInfo info) throws UnauthorizedException {
         try {
             infoProvider.updateDispatcherInfo(queue.getID(), info);
@@ -494,38 +499,47 @@ public class RoundRobinDispatcher implements Dispatcher, AgentSessionListener {
         }
     }
 
+    @Override
     public int getOfferCount() {
         return offers.size();
     }
 
+    @Override
     public Iterator<Offer> getOffers() {
         return offers.iterator();
     }
 
+    @Override
     public Iterator<Offer> getOffers(WorkgroupResultFilter filter) {
         return filter.filter(offers.iterator());
     }
 
+    @Override
     public String getProperty(String name) {
         return properties.getProperty(name);
     }
 
+    @Override
     public void setProperty(String name, String value) throws UnauthorizedException {
         properties.setProperty(name, value);
     }
 
+    @Override
     public void deleteProperty(String name) throws UnauthorizedException {
         properties.deleteProperty(name);
     }
 
+    @Override
     public Collection<String> getPropertyNames() {
         return properties.getPropertyNames();
     }
 
+    @Override
     public AgentSelector getAgentSelector() {
         return agentSelector;
     }
 
+    @Override
     public void setAgentSelector(AgentSelector agentSelector) {
         this.agentSelector = agentSelector;
         // Delete all agentSelector properties.
@@ -625,6 +639,7 @@ public class RoundRobinDispatcher implements Dispatcher, AgentSessionListener {
         return results;
     }
 
+    @Override
     public void shutdown() {
         // Do nothing
     }
