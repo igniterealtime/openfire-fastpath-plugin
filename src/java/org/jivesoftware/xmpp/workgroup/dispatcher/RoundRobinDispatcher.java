@@ -488,10 +488,7 @@ public class RoundRobinDispatcher implements Dispatcher, AgentSessionListener {
             infoProvider.updateDispatcherInfo(queue.getID(), info);
             this.info = info;
         }
-        catch (NotFoundException e) {
-            Log.error(e.getMessage(), e);
-        }
-        catch (UnsupportedOperationException e) {
+        catch (NotFoundException | UnsupportedOperationException e) {
             Log.error(e.getMessage(), e);
         }
     }
