@@ -64,23 +64,23 @@ public class RoundRobinDispatcher implements Dispatcher, AgentSessionListener {
     /**
      * The circular list of agents in the pool.
      */
-    private List<AgentSession> agentList;
+    private final List<AgentSession> agentList;
 
-    private RequestQueue queue;
+    private final RequestQueue queue;
 
     /**
      * Prop manager for the dispatcher.
      */
-    private JiveLiveProperties properties;
+    private final JiveLiveProperties properties;
     private DispatcherInfo info;
-    private DispatcherInfoProvider infoProvider = new DbDispatcherInfoProvider();
+    private final DispatcherInfoProvider infoProvider = new DbDispatcherInfoProvider();
     private AgentSelector agentSelector = WorkgroupUtils.getAvailableAgentSelectors().get(0);
     /**
      * A set of all outstanding offers in the workgroup
      *
      * Let's the server route offer responses to the correct offer.
      */
-    private Set<Offer> offers = Collections.newSetFromMap(new ConcurrentHashMap<Offer, Boolean>());
+    private final Set<Offer> offers = Collections.newSetFromMap(new ConcurrentHashMap<Offer, Boolean>());
 
     /**
      * Creates a new dispatcher for the queue. The dispatcher will have a Timer with a unique task
