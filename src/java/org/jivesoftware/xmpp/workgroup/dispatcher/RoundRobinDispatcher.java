@@ -235,7 +235,7 @@ public class RoundRobinDispatcher implements Dispatcher, AgentSessionListener {
                     }
                 }
                 catch (Exception e) {
-                    Log.error(e.getMessage(), e);
+                    Log.error("An unexpected exception occurred while dispatching offer: {}", offer, e);
                 }
             }
         }
@@ -489,7 +489,7 @@ public class RoundRobinDispatcher implements Dispatcher, AgentSessionListener {
             this.info = info;
         }
         catch (NotFoundException | UnsupportedOperationException e) {
-            Log.error(e.getMessage(), e);
+            Log.error("An unexpected exception occurred while setting dispatcher info: {}", info, e);
         }
     }
 
@@ -536,7 +536,7 @@ public class RoundRobinDispatcher implements Dispatcher, AgentSessionListener {
             }
         }
         catch (Exception e) {
-           Log.error(e.getMessage(), e);
+           Log.error("An unexpected exception occurred while setting agent selector: {}", agentSelector, e);
        }
         // Save the agentSelectoras a property of the dispatcher
         try {
@@ -546,7 +546,7 @@ public class RoundRobinDispatcher implements Dispatcher, AgentSessionListener {
             }
         }
         catch (Exception e) {
-           Log.error(e.getMessage(), e);
+            Log.error("An unexpected exception occurred while saving agent selector as a property of the dispatcher: {}", agentSelector, e);
        }
     }
 
@@ -594,7 +594,7 @@ public class RoundRobinDispatcher implements Dispatcher, AgentSessionListener {
             BeanUtils.setProperties(agentSelector, agentSelectorProps);
         }
         catch (Exception e) {
-            Log.error(e.getMessage(), e);
+            Log.error("An unexpected exception occurred while loading an agent selector.", e);
         }
     }
 
