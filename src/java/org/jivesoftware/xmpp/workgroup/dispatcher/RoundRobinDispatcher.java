@@ -189,8 +189,7 @@ public class RoundRobinDispatcher implements Dispatcher, AgentSessionListener {
                             // Set the timeout of the offer based on the remaining time of the
                             // initial request and the default offer timeout
                             timeRemaining = timeoutTime - System.currentTimeMillis();
-                            offer.setTimeout(timeRemaining < info.getOfferTimeout() ?
-                                    timeRemaining : info.getOfferTimeout());
+                            offer.setTimeout(Math.min(timeRemaining, info.getOfferTimeout()));
 
                             // Make the offer and wait for a resolution to the offer
                             if (!request.sendOffer(session, queue)) {
