@@ -141,7 +141,7 @@ public class RequestQueue {
     /**
      * Dispatcher for the queue.
      */
-    private RoundRobinDispatcher dispatcher;
+    private Dispatcher dispatcher;
 
     /**
      * The overflow type of this queue.
