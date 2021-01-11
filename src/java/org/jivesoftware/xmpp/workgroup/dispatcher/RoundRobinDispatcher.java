@@ -579,7 +579,7 @@ public class RoundRobinDispatcher implements Dispatcher, AgentSessionListener {
                 // Do nothing and use the BasicAgentSelector
                 return;
             }
-            Class agentSelectorClass = loadClass(className);
+            Class<?> agentSelectorClass = loadClass(className);
             agentSelector = (AgentSelector) agentSelectorClass.newInstance();
 
             // Load properties.
@@ -601,7 +601,7 @@ public class RoundRobinDispatcher implements Dispatcher, AgentSessionListener {
         }
     }
 
-    private Class loadClass(String className) throws ClassNotFoundException {
+    private Class<?> loadClass(String className) throws ClassNotFoundException {
         try {
             return ClassUtils.forName(className);
         }
