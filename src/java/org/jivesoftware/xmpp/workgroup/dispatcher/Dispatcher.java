@@ -96,4 +96,9 @@ public interface Dispatcher extends DbProperties {
      * @param request the request to be processed.
      */
     void injectRequest(Request request);
+
+    /**
+     * Called when the workgroup request queue gets shut down. Can be used for clean-up purposes, if needed.
+     */
+    void shutdown();
 }
