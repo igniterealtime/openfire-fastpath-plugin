@@ -80,7 +80,7 @@ public class RoundRobinDispatcher implements Dispatcher, AgentSessionListener {
      *
      * Let's the server route offer responses to the correct offer.
      */
-    private final Set<Offer> offers = Collections.newSetFromMap(new ConcurrentHashMap<Offer, Boolean>());
+    private final Set<Offer> offers = Collections.newSetFromMap(new ConcurrentHashMap<>());
 
     /**
      * Creates a new dispatcher for the queue. The dispatcher will have a Timer with a unique task
@@ -91,7 +91,7 @@ public class RoundRobinDispatcher implements Dispatcher, AgentSessionListener {
      */
     public RoundRobinDispatcher(RequestQueue queue) {
         this.queue = queue;
-        agentList = new LinkedList<AgentSession>();
+        agentList = new LinkedList<>();
         properties = new JiveLiveProperties("fpDispatcherProp", queue.getID());
         try {
             info = infoProvider.getDispatcherInfo(queue.getWorkgroup(), queue.getID());
@@ -310,7 +310,7 @@ public class RoundRobinDispatcher implements Dispatcher, AgentSessionListener {
         int qCount = queue.getWorkgroup().getRequestQueueCount();
         if (qCount > 1) {
             // Build a list of all queues eligible for overflow
-            LinkedList<RequestQueue> overflowQueueList = new LinkedList<RequestQueue>();
+            LinkedList<RequestQueue> overflowQueueList = new LinkedList<>();
             for (RequestQueue overflowQueue : queue.getWorkgroup().getRequestQueues()) {
                 if (!queue.equals(overflowQueue) && overflowQueue.getAgentSessionList().containsAvailableAgents()) {
                     overflowQueueList.addLast(overflowQueue);
@@ -386,7 +386,7 @@ public class RoundRobinDispatcher implements Dispatcher, AgentSessionListener {
 
         // Let's iterate through each agent and check availability
         final AgentSessionList agentSessionList = queue.getAgentSessionList();
-        final List<AgentSession> possibleSessions = new ArrayList<AgentSession>();
+        final List<AgentSession> possibleSessions = new ArrayList<>();
         for (AgentSession agentSession : agentSessionList.getAgentSessions()) {
             String sessionAgent = agentSession.getAgent().getAgentJID().toBareJID();
             boolean ignore = ignoreAgent != null && sessionAgent.startsWith(ignoreAgent.toLowerCase());
@@ -556,7 +556,7 @@ public class RoundRobinDispatcher implements Dispatcher, AgentSessionListener {
 
     private Map<String, String> getPropertiesMap(AgentSelector agentSelector, String context) {
         // Build the properties map that will be saved later
-        Map<String, String> propertyMap = new HashMap<String, String>();
+        Map<String, String> propertyMap = new HashMap<>();
         // Write out class name
         propertyMap.put(context + "className", agentSelector.getClass().getName());
 
@@ -585,7 +585,7 @@ public class RoundRobinDispatcher implements Dispatcher, AgentSessionListener {
 
             // Load properties.
             Collection<String> props = getChildrenPropertyNames(context + "properties", getPropertyNames());
-            Map<String, String> agentSelectorProps = new HashMap<String, String>();
+            Map<String, String> agentSelectorProps = new HashMap<>();
 
             for (String key : props) {
                 String value = getProperty(key);
@@ -619,7 +619,7 @@ public class RoundRobinDispatcher implements Dispatcher, AgentSessionListener {
      * @return an Iterator of child property names.
      */
     private static Collection<String> getChildrenPropertyNames(String parent, Collection<String> properties) {
-        List<String> results = new ArrayList<String>();
+        List<String> results = new ArrayList<>();
         for (String name : properties) {
             if (name.startsWith(parent) && !name.equals(parent)) {
                 results.add(name);
