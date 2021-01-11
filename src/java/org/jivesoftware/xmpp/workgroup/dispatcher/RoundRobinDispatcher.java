@@ -75,6 +75,7 @@ public class RoundRobinDispatcher implements Dispatcher, AgentSessionListener {
     private DispatcherInfo info;
     private final DispatcherInfoProvider infoProvider = new DbDispatcherInfoProvider();
     private AgentSelector agentSelector = WorkgroupUtils.getAvailableAgentSelectors().get(0);
+
     /**
      * A set of all outstanding offers in the workgroup
      *
@@ -117,7 +118,7 @@ public class RoundRobinDispatcher implements Dispatcher, AgentSessionListener {
 
     private void checkForNewRequests() {
         for(Request request : queue.getRequests()){
-            // While there are requests pendings try to dispatch an offer for the request to an agent
+            // While there are requests pending try to dispatch an offer for the request to an agent
             // Skip this request if there exists an offer for this requests that is being processed
             if (request.getOffer() != null && offers.contains(request.getOffer())) {
                 continue;
@@ -448,7 +449,7 @@ public class RoundRobinDispatcher implements Dispatcher, AgentSessionListener {
     }
 
     /**
-     * Returns the max number of times a request may overflow. Once the request has exceded this
+     * Returns the max number of times a request may overflow. Once the request has exceeded this
      * number it will be cancelled. This limit avoids infinite overflow loops.
      *
      * @return the max number of times a request may overflow.
@@ -527,7 +528,7 @@ public class RoundRobinDispatcher implements Dispatcher, AgentSessionListener {
 
     public void setAgentSelector(AgentSelector agentSelector) {
         this.agentSelector = agentSelector;
-        // Delete all agentSelectorproperties.
+        // Delete all agentSelector properties.
         try {
             for (String property : getPropertyNames()) {
                if (property.startsWith("agentSelector")) {
@@ -538,7 +539,7 @@ public class RoundRobinDispatcher implements Dispatcher, AgentSessionListener {
         catch (Exception e) {
            Log.error("An unexpected exception occurred while setting agent selector: {}", agentSelector, e);
        }
-        // Save the agentSelectoras a property of the dispatcher
+        // Save the agentSelector as a property of the dispatcher
         try {
             Map<String, String> propertyMap = getPropertiesMap(agentSelector, "agentSelector.");
             for (Map.Entry<String, String> entry : propertyMap.entrySet()) {
