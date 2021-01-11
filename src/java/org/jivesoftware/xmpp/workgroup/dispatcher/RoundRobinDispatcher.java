@@ -50,9 +50,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * <p>Implements simple round robin dispatching of offers to agents.</p>
- * <p>Agents are offered requests one at a time with no agent being offer
- * the same request twice (unless their current-chats status changes).</p>
+ * Implements simple round robin dispatching of offers to agents.
+ * Agents are offered requests one at a time with no agent being offer
+ * the same request twice (unless their current-chats status changes).
  *
  * @author Derek DeMoro
  * @author Iain Shigeoka
@@ -62,21 +62,21 @@ public class RoundRobinDispatcher implements Dispatcher, AgentSessionListener {
     private static final Logger Log = LoggerFactory.getLogger(RoundRobinDispatcher.class);
             
     /**
-     * <p>The circular list of agents in the pool.</p>
+     * The circular list of agents in the pool.
      */
     private List<AgentSession> agentList;
 
     private RequestQueue queue;
 
     /**
-     * <p>Prop manager for the dispatcher.</p>
+     * Prop manager for the dispatcher.
      */
     private JiveLiveProperties properties;
     private DispatcherInfo info;
     private DispatcherInfoProvider infoProvider = new DbDispatcherInfoProvider();
     private AgentSelector agentSelector = WorkgroupUtils.getAvailableAgentSelectors().get(0);
     /**
-     * A set of all outstanding offers in the workgroup<p>
+     * A set of all outstanding offers in the workgroup
      *
      * Let's the server route offer responses to the correct offer.
      */
@@ -144,7 +144,7 @@ public class RoundRobinDispatcher implements Dispatcher, AgentSessionListener {
     }
 
     /**
-     * Dispatch the given request to one or more agents in the agent pool.<p>
+     * Dispatch the given request to one or more agents in the agent pool.
      *
      * If this method returns, it is assumed that the request was properly
      * dispatched.The only exception is if an agent is not in the pool for routing
@@ -265,12 +265,12 @@ public class RoundRobinDispatcher implements Dispatcher, AgentSessionListener {
     }
 
     /**
-     * <p>Overflow the current request into another queue if possible.</p>
-     * <p/>
-     * <p>Future versions of the dispatcher may wish to overflow in
+     * Overflow the current request into another queue if possible.
+     *
+     * Future versions of the dispatcher may wish to overflow in
      * more sophisticated ways. Currently we do it according to overflow
      * rules: none (no overflow), backup (to a backup if it exists and is
-     * available, or randomly.</p>
+     * available, or randomly.
      *
      * @param offer the offer to place in the overflow queue.
      */
@@ -330,13 +330,13 @@ public class RoundRobinDispatcher implements Dispatcher, AgentSessionListener {
     }
 
     /**
-     * <p>Locate the next 'best' agent to receive an offer.</p>
-     * <p>Routing is based on show-status, max-chats, and who has
+     * Locate the next 'best' agent to receive an offer.
+     * Routing is based on show-status, max-chats, and who has
      * already rejected the offer.
      * show status is ranked from most available to least:
      * chat, default (no show status), away,
      * and xa. A show status of dnd indicates no offers should be routed to an agent.
-     * The general algorithm is:</p>
+     * The general algorithm is:
      * <ul>
      * <li>Mark the current position.</li>
      * <li>Start iterating around the circular queue until all agents
@@ -436,7 +436,7 @@ public class RoundRobinDispatcher implements Dispatcher, AgentSessionListener {
     }
 
     /**
-     * <p>Generate the agents offer list.</p>
+     * Generate the agents offer list.
      */
     private void fillAgentsList() {
         AgentSessionList agentSessionList = queue.getAgentSessionList();
