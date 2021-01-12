@@ -83,7 +83,7 @@ public class RequestQueue {
      * A map of all requests in the workgroup keyed by the request's JID.
      * Lets the server route request packets to the correct request.
      */
-    private LinkedList<UserRequest> requests = new LinkedList<UserRequest>();
+    private LinkedList<UserRequest> requests = new LinkedList<>();
 
     /**
      * A listof active agent sessions that belong to this queue.
@@ -126,12 +126,12 @@ public class RequestQueue {
     /**
      * The agent groups that belong to this request queue.
      */
-    private Set<String> groups = new CopyOnWriteArraySet<String>();
+    private Set<String> groups = new CopyOnWriteArraySet<>();
 
     /**
      * The agents that belong directly to this request queue.
      */
-    private Set<Agent> agents = new CopyOnWriteArraySet<Agent>();
+    private Set<Agent> agents = new CopyOnWriteArraySet<>();
 
     /**
      * The workgoup entity properties for the queue.
@@ -233,7 +233,7 @@ public class RequestQueue {
     }
 
     public Collection<UserRequest> getRequests() {
-        return new ArrayList<UserRequest>(requests);
+        return new ArrayList<>(requests);
     }
 
     public UserRequest getRequest(JID requestAddress) {
@@ -466,7 +466,7 @@ public class RequestQueue {
 
     private Collection<Group> getGroupObjects() {
         final GroupManager groupManager = GroupManager.getInstance();
-        Set<Group> objects = new HashSet<Group>(groups.size());
+        Set<Group> objects = new HashSet<>(groups.size());
         for (String group : groups) {
             try {
                 objects.add(groupManager.getGroup(group));
@@ -572,7 +572,7 @@ public class RequestQueue {
      * @return a collection of queue members.
      */
     public Collection<Agent> getMembers() {
-        final Set<Agent> agentList = new HashSet<Agent>(agents);
+        final Set<Agent> agentList = new HashSet<>(agents);
 
 
         return Collections.unmodifiableCollection(agentList);
