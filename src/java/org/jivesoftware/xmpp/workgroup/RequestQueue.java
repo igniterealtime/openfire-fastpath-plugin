@@ -630,7 +630,7 @@ public class RequestQueue {
 
     public DbProperties getProperties() {
         if (properties == null) {
-            properties = new JiveLiveProperties("jlaQueueProp", id);
+            properties = new JiveLiveProperties("fpQueueProp", id);
         }
         return properties;
     }

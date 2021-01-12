@@ -43,7 +43,7 @@ public class ChatNotes implements WorkgroupProvider {
     private static final String SET_NOTES = "UPDATE fpSession SET notes=? WHERE sessionID=?";
 
     /**
-     * Updates a note within Live Assistant Database (jlaSession table)
+     * Updates a note within Live Assistant Database (fpSession table)
      *
      * @param sessionID the chat sessionID associated with this note.
      * @param note the note itself.
@@ -72,7 +72,7 @@ public class ChatNotes implements WorkgroupProvider {
     }
 
     /**
-     * Retrieves a note from the Live Assistant Database. (jlaSession table)
+     * Retrieves a note from the Live Assistant Database. (fpSession table)
      *
      * @param sessionID the sessionID that the note is mapped to.
      * @return the note found. If no note is found, null will be returned.
