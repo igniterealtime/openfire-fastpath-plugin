@@ -432,10 +432,6 @@ public class RequestQueue {
     // #################################################################
     private static final FastDateFormat UTC_FORMAT = FastDateFormat.getInstance("yyyyMMdd'T'HH:mm:ss", TimeZone.getTimeZone("UTC"));
 
-    static {
-        //UTC_FORMAT.setTimeZone(TimeZone.getTimeZone("GMT+0"));
-    }
-
     // ###########################################################################
     // Misc queue runtime properties
     // ###########################################################################
@@ -619,7 +615,6 @@ public class RequestQueue {
     }
 
     public void setCreationDate(Date creationDate) {
-
     }
 
     public Date getModificationDate() {
@@ -627,7 +622,6 @@ public class RequestQueue {
     }
 
     public void setModificationDate(Date modificationDate) {
-
     }
 
     public String getDescription() {
@@ -919,7 +913,7 @@ public class RequestQueue {
      *
      * @author Iain Shigeoka
      */
-    public static enum OverflowType {
+    public enum OverflowType {
         /**
          * Requests are not overflowed to other queues.
          */
