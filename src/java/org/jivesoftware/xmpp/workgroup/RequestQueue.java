@@ -83,12 +83,12 @@ public class RequestQueue {
      * A map of all requests in the workgroup keyed by the request's JID.
      * Lets the server route request packets to the correct request.
      */
-    private LinkedList<UserRequest> requests = new LinkedList<>();
+    private final LinkedList<UserRequest> requests = new LinkedList<>();
 
     /**
      * A listof active agent sessions that belong to this queue.
      */
-    private AgentSessionList activeAgents = new AgentSessionList();
+    private final AgentSessionList activeAgents = new AgentSessionList();
 
     /**
      * The current average time a request spends in this queue.
@@ -98,7 +98,7 @@ public class RequestQueue {
     /**
      * The workgroup this queue belongs to.
      */
-    private Workgroup workgroup;
+    private final Workgroup workgroup;
 
     /**
      * The default floor for maximum number of chats that an agent
@@ -126,12 +126,12 @@ public class RequestQueue {
     /**
      * The agent groups that belong to this request queue.
      */
-    private Set<String> groups = new CopyOnWriteArraySet<>();
+    private final Set<String> groups = new CopyOnWriteArraySet<>();
 
     /**
      * The agents that belong directly to this request queue.
      */
-    private Set<Agent> agents = new CopyOnWriteArraySet<>();
+    private final Set<Agent> agents = new CopyOnWriteArraySet<>();
 
     /**
      * The workgoup entity properties for the queue.
@@ -141,7 +141,7 @@ public class RequestQueue {
     /**
      * Dispatcher for the queue.
      */
-    private Dispatcher dispatcher;
+    private final Dispatcher dispatcher;
 
     /**
      * The overflow type of this queue.
@@ -176,12 +176,12 @@ public class RequestQueue {
     /**
      * The creation Date *
      */
-    private Date creationDate;
+    private final Date creationDate;
 
     /**
      * The queue id
      */
-    private long id;
+    private final long id;
 
     /**
      * The RequestQueue XMPPAdderess
@@ -189,7 +189,7 @@ public class RequestQueue {
     private JID address;
 
 
-    private AgentManager agentManager;
+    private final AgentManager agentManager;
 
     /**
      * Creates a request queue for the given workgroup given a
