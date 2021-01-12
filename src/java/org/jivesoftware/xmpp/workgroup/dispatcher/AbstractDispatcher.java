@@ -170,10 +170,12 @@ public abstract class AbstractDispatcher implements Dispatcher, AgentSessionList
             final Instant timeout = Instant.now().plus(Duration.ofMillis(info.getRequestTimeout()));
 
             final Map<String, List<String>> map = request.getMetaData();
-            final String initialAgent = map.get("agent") == null || map.get("agent").isEmpty() ? null : map.get("agent").get(0);
-            final String ignoreAgent = map.get("ignore") == null || map.get("ignore").isEmpty() ? null : map.get("ignore").get(0);
+            final String initialAgentName = map.get("agent") == null || map.get("agent").isEmpty() ? null : map.get("agent").get(0);
+            final String ignoreAgentName = map.get("ignore") == null || map.get("ignore").isEmpty() ? null : map.get("ignore").get(0);
+            final AgentSession initialAgent = initialAgentName == null ? null : findAgentSessionByName(initialAgentName).orElse(null);
+            final AgentSession ignoreAgent = ignoreAgentName == null ? null : findAgentSessionByName(ignoreAgentName).orElse(null);
 
-            sendToAgent(offer, timeout, findAgentSessionByName(initialAgent).orElse(null), findAgentSessionByName(ignoreAgent).orElse(null));
+            sendToAgent(offer, timeout, initialAgent, ignoreAgent);
         } else {
             Log.debug("Agent list is empty. Cannot send to request: {} in queue: {} to any of its agents.", request, queue.getAddress());
         }
