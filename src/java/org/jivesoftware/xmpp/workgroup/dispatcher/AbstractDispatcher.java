@@ -303,7 +303,7 @@ public abstract class AbstractDispatcher implements Dispatcher, AgentSessionList
             Log.debug("Validated Agent: {} MAY receive offer for request: {}", session.getJID(), offer.getRequest());
             return true;
         } else {
-            Log.debug("Cold not validate Agent: {} MAY NOT receive offer for request: {}", session.getJID(), offer.getRequest());
+            Log.debug("Could not validate Agent: {} MAY NOT receive offer for request: {}", session.getJID(), offer.getRequest());
             return false;
         }
     }
