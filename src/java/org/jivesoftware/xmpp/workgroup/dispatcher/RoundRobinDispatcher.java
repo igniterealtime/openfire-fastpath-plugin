@@ -58,7 +58,7 @@ public class RoundRobinDispatcher extends AbstractDispatcher {
         boolean canBeInQueue = request instanceof UserRequest;
 
 
-        for (Duration timeRemaining = Duration.between(timeout, Instant.now());
+        for (Duration timeRemaining = Duration.between(Instant.now(), timeout);
              !offer.isAccepted() && !timeRemaining.isNegative() && !offer.isCancelled();) {
             try {
                 AgentSession session = getBestNextAgent(initialAgent, ignoreAgent, offer);
@@ -76,7 +76,7 @@ public class RoundRobinDispatcher extends AbstractDispatcher {
                     if (session.getCurrentChats(workgroup) < session.getMaxChats(workgroup)) {
                         // Set the timeout of the offer based on the remaining time of the
                         // initial request and the default offer timeout
-                        timeRemaining = Duration.between(timeout, Instant.now());
+                        timeRemaining = Duration.between(Instant.now(), timeout);
                         offer.setTimeout(Math.min(timeRemaining.toMillis(), info.getOfferTimeout()));
 
                         // Make the offer and wait for a resolution to the offer
