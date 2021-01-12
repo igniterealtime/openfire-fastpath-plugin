@@ -41,6 +41,7 @@ import org.jivesoftware.database.DbConnectionManager;
 import org.jivesoftware.database.SequenceManager;
 import org.jivesoftware.openfire.fastpath.util.TaskEngine;
 import org.jivesoftware.openfire.group.Group;
+import org.jivesoftware.openfire.muc.MUCRole;
 import org.jivesoftware.util.FastDateFormat;
 import org.jivesoftware.util.NotFoundException;
 import org.jivesoftware.util.StringUtils;
@@ -821,9 +822,9 @@ public class Workgroup {
             fields.put("anonymous", values);
             // Broadcast presences of moderators, participants and visitors
             values = new ArrayList<String>();
-            values.add("participant");
-            values.add("visitor");
-            values.add("moderators");
+            values.add(MUCRole.Role.participant.toString());
+            values.add(MUCRole.Role.visitor.toString());
+            values.add(MUCRole.Role.moderator.toString());
             fields.put("muc#roomconfig_presencebroadcast", values);
 
             RoomConfiguration conf = new RoomConfiguration(fields);
