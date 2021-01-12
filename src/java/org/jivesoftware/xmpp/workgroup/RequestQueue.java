@@ -16,29 +16,23 @@
 
 package org.jivesoftware.xmpp.workgroup;
 
+import java.lang.reflect.InvocationTargetException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.Set;
-import java.util.TimeZone;
+import java.util.*;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 import org.dom4j.Element;
 import org.jivesoftware.database.DbConnectionManager;
+import org.jivesoftware.openfire.fastpath.util.WorkgroupUtils;
 import org.jivesoftware.openfire.group.Group;
 import org.jivesoftware.openfire.group.GroupManager;
 import org.jivesoftware.openfire.group.GroupNotFoundException;
 import org.jivesoftware.util.FastDateFormat;
 import org.jivesoftware.util.NotFoundException;
 import org.jivesoftware.xmpp.workgroup.dispatcher.Dispatcher;
-import org.jivesoftware.xmpp.workgroup.dispatcher.RoundRobinDispatcher;
 import org.jivesoftware.xmpp.workgroup.request.Request;
 import org.jivesoftware.xmpp.workgroup.request.UserRequest;
 import org.jivesoftware.xmpp.workgroup.spi.JiveLiveProperties;
@@ -60,11 +54,11 @@ public class RequestQueue {
     private static final Logger Log = LoggerFactory.getLogger(RequestQueue.class);
     
     private static final String LOAD_QUEUE =
-            "SELECT name, description, priority, maxchats, minchats, overflow, backupQueue FROM " +
+            "SELECT name, description, priority, maxchats, minchats, overflow, backupQueue, dispatcherClass FROM " +
             "fpQueue WHERE queueID=?";
     private static final String UPDATE_QUEUE =
             "UPDATE fpQueue SET name=?, description=?, priority=?, maxchats=?, minchats=?, " +
-            "overflow=?, backupQueue=? WHERE queueID=?";
+            "overflow=?, backupQueue=?, dispatcherClass=? WHERE queueID=?";
     private static final String DELETE_QUEUE =
             "DELETE FROM fpQueueAgent WHERE objectType=? AND objectID=? AND queueID=?";
     private static final String LOAD_AGENTS =
@@ -139,9 +133,14 @@ public class RequestQueue {
     private JiveLiveProperties properties;
 
     /**
+     * The name of the class that implements the Dispatcher used by this queue.
+     */
+    private String dispatcherClassName = null;
+
+    /**
      * Dispatcher for the queue.
      */
-    private final Dispatcher dispatcher;
+    private Dispatcher dispatcher;
 
     /**
      * The overflow type of this queue.
@@ -211,7 +210,12 @@ public class RequestQueue {
         // Load all Agents
         loadAgents();
 
-        dispatcher = new RoundRobinDispatcher(this);
+        try {
+            final Class<? extends Dispatcher> target = getDispatcherClass() == null ? getDefaultDispatcherClass() : getDispatcherClass();
+            dispatcher = target.getDeclaredConstructor(RequestQueue.class).newInstance(this);
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+            Log.error("Unable to instantiate dispatcher for request queue with ID: {}", id, e);
+        }
         creationDate = new Date();
         agentManager = workgroup.getAgentManager();
     }
@@ -666,6 +670,59 @@ public class RequestQueue {
         updateQueue();
     }
 
+    public Class<? extends Dispatcher> getDefaultDispatcherClass() {
+        return WorkgroupUtils.getAvailableDispatcherClasses().get(0);
+    }
+
+    public Class<? extends Dispatcher> getDispatcherClass() {
+        if (dispatcherClassName == null) {
+            return null;
+        }
+
+        final List<Class<? extends Dispatcher>> available = WorkgroupUtils.getAvailableDispatcherClasses();
+        if (dispatcherClassName != null) {
+            final Optional<Class<? extends Dispatcher>> matchingClassName = available.stream()
+                .filter(c -> c.getName().equals(dispatcherClassName))
+                .findAny();
+
+            if (matchingClassName.isPresent()) {
+                return matchingClassName.get();
+            } else {
+                Log.warn("Unable to find class for queue {}: {}. Using a default Dispatcher instead.", this.id, dispatcherClassName);
+            }
+        }
+
+        return null;
+    }
+
+    public void setDispatcher(Class<? extends Dispatcher> dispatcherClass) {
+        if (dispatcherClass == null) {
+            // set the default.
+            dispatcherClassName = null;
+            dispatcherClass = getDefaultDispatcherClass();
+        } else {
+            final List<Class<? extends Dispatcher>> available = WorkgroupUtils.getAvailableDispatcherClasses();
+            if (!available.contains(dispatcherClass)) {
+                throw new IllegalArgumentException("Argument 'dispatcherClass' refers to an implementation that is not available: " + dispatcherClass);
+            }
+
+            dispatcherClassName = dispatcherClass.getName();
+        }
+        updateQueue();
+
+        // Replace the existing dispatcher if needed.
+        if (!dispatcher.getClass().equals(dispatcherClass)) {
+            Log.debug("Replacing dispatcher for queue with ID: {} for new implementation: {}", id, dispatcherClass.getName());
+            dispatcher.shutdown();
+            try {
+                final Class<? extends Dispatcher> target = getDispatcherClass() == null ? getDefaultDispatcherClass() : getDispatcherClass();
+                dispatcher = target.getDeclaredConstructor(RequestQueue.class).newInstance(this);
+            } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+                Log.error("Unable to instantiate dispatcher for request queue with ID: {}", id, e);
+            }
+        }
+    }
+
     private static final int AGENT_TYPE = 0;
     private static final int GROUP_TYPE = 1;
 
@@ -696,7 +753,7 @@ public class RequestQueue {
                     overflowType = OverflowType.OVERFLOW_NONE;
             }
             backupQueueID = rs.getLong(7);
-
+            dispatcherClassName = rs.getString(8);
         }
         catch (SQLException e) {
             Log.error("Database exception while attempting to load queue with ID: {}", id, e);
@@ -719,7 +776,8 @@ public class RequestQueue {
             pstmt.setInt(5, minChats);
             pstmt.setInt(6, overflowType.ordinal());
             pstmt.setLong(7, backupQueueID);
-            pstmt.setLong(8, id);
+            pstmt.setString(8, dispatcherClassName);
+            pstmt.setLong(9, id);
             pstmt.executeUpdate();
         }
         catch (SQLException e) {

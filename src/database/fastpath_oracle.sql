@@ -1,5 +1,5 @@
 
-INSERT INTO ofVersion (name, version) VALUES ('fastpath', 0);
+INSERT INTO ofVersion (name, version) VALUES ('fastpath', 1);
 
 CREATE TABLE fpWorkgroup(
   workgroupID         INT NOT NULL,
@@ -52,6 +52,7 @@ CREATE TABLE fpQueue(
   minchats            INT NOT NULL,
   overflow            INT NOT NULL,
   backupQueue         INT NULL,
+  dispatcherClass     VARCHAR(3900) NULL,
   CONSTRAINT fpQueue_pk PRIMARY KEY (workgroupID,queueID)
 );
 CREATE INDEX fpqueue_workgroupid_idx ON fpQueue(workgroupID);

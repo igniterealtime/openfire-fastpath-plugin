@@ -475,7 +475,9 @@ public abstract class AbstractDispatcher implements Dispatcher, AgentSessionList
 
     @Override
     public void shutdown() {
-        // Do nothing
+        for (final Offer offer : offers) {
+            offer.cancel();
+        }
     }
 
     /**
