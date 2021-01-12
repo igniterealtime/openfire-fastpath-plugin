@@ -317,7 +317,7 @@ public class RequestQueue {
             workgroup.send(queueStatus);
         }
         catch (Exception e) {
-            Log.error(e.getMessage(), e);
+            Log.error("An exception occurred while trying to send status to recipient: {}", recipient, e);
         }
     }
 
@@ -329,7 +329,7 @@ public class RequestQueue {
             workgroup.send(queueStatus);
         }
         catch (Exception e) {
-            Log.error(e.getMessage(), e);
+            Log.error("An exception occurred while trying to send detailed status to recipient: {}", recipient, e);
         }
     }
 
@@ -410,7 +410,7 @@ public class RequestQueue {
                 details.remove(user);
                 // Log an error if the request still belongs to this queue
                 if (this.equals(request.getRequestQueue())) {
-                    Log.error(e.getMessage(), e);
+                    Log.error("Unexpected statue of queue of request from: {}", request.getUserJID(), e);
                 }
             }
         }
@@ -699,7 +699,7 @@ public class RequestQueue {
 
         }
         catch (SQLException e) {
-            Log.error(e.getMessage(), e);
+            Log.error("Database exception while attempting to load queue with ID: {}", id, e);
         }
         finally {
             DbConnectionManager.closeConnection(rs, pstmt, con);
@@ -723,7 +723,7 @@ public class RequestQueue {
             pstmt.executeUpdate();
         }
         catch (SQLException e) {
-            Log.error(e.getMessage(), e);
+            Log.error("Database exception while trying to update the queue with ID: {}", id, e);
         }
         finally {
             DbConnectionManager.closeConnection(pstmt, con);
@@ -748,7 +748,7 @@ public class RequestQueue {
             return true;
         }
         catch (SQLException e) {
-            Log.error(e.getMessage(), e);
+            Log.error("Database exception while trying to delete object with ID: {} to queue with ID: {}", new Object[] {objectID, id, e});
         }
         finally {
             DbConnectionManager.closeConnection(pstmt, con);
@@ -774,7 +774,7 @@ public class RequestQueue {
             return true;
         }
         catch (SQLException e) {
-            Log.error(e.getMessage(), e);
+            Log.error("Database exception while trying to add agent to queue with ID: {}", id, e);
         }
         finally {
             DbConnectionManager.closeConnection(pstmt, con);
@@ -794,7 +794,7 @@ public class RequestQueue {
             return true;
         }
         catch (SQLException e) {
-            Log.error(e.getMessage(), e);
+            Log.error("Database exception while trying to add a group to queue with ID: {}", id, e);
         }
         finally {
             DbConnectionManager.closeConnection(pstmt, con);
@@ -814,7 +814,7 @@ public class RequestQueue {
             return true;
         }
         catch (SQLException e) {
-            Log.error(e.getMessage(), e);
+            Log.error("Database exception while trying to delete a group from queue with ID: {}", id, e);
         }
         finally {
             DbConnectionManager.closeConnection(pstmt, con);
@@ -838,7 +838,7 @@ public class RequestQueue {
             }
         }
         catch (Exception e) {
-            Log.error(e.getMessage(), e);
+            Log.error("Database exception while trying to load groups for queue with ID: {}", id, e);
         }
         finally {
             DbConnectionManager.closeConnection(rs, pstmt, con);
@@ -858,17 +858,18 @@ public class RequestQueue {
 
             AgentManager agentManager = workgroup.getAgentManager();
             while (rs.next()) {
+                final long agentId = rs.getLong(1);
                 try {
-                    Agent agent = agentManager.getAgent(rs.getLong(1));
+                    Agent agent = agentManager.getAgent(agentId);
                     agents.add(agent);
                 }
                 catch (AgentNotFoundException e) {
-                    Log.error(e.getMessage(), e);
+                    Log.error("Queue with ID {} specifies an agent with ID {}. That agent ID does not exist.", new Object[] {id, agentId, e});
                 }
             }
         }
         catch (SQLException e) {
-            Log.error(e.getMessage(), e);
+            Log.error("Database exception while trying to load agents for queue with ID: {}", id, e);
         }
         finally {
             DbConnectionManager.closeConnection(rs, pstmt, con);
