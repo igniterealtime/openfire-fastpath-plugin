@@ -18,6 +18,7 @@
 <%@ page import="org.jivesoftware.xmpp.workgroup.AgentNotFoundException"%>
 <%@ page import="org.jivesoftware.util.Log"%><%@ page import="org.jivesoftware.openfire.group.GroupNotFoundException"%>
 <%@ page import="org.jivesoftware.openfire.user.UserManager"%>
+<%@ page import="org.jivesoftware.openfire.fastpath.util.WorkgroupUtils" %>
 <%
     // Get parameters //
     String wgID = ParamUtils.getParameter(request, "wgID");
@@ -189,6 +190,13 @@
     else {
         overFlowDescription = "Overflow to random queue.";
     }
+
+    String dispatcherType;
+    if (queue.getDispatcherClass() != null) {
+        dispatcherType = WorkgroupUtils.humanReadableDispatcherName(queue.getDispatcherClass());
+    } else {
+        dispatcherType = "Default (" + WorkgroupUtils.humanReadableDispatcherName(queue.getDefaultDispatcherClass()) + ")";
+    }
 %>
 
 
@@ -252,6 +260,10 @@
      <tr>
          <td width="1%" nowrap>Overflow Policy:</td>
          <td><%= overFlowDescription%></td>
+     </tr>
+     <tr>
+         <td width="1%" nowrap>Dispatcher Type:</td>
+         <td><%= dispatcherType %></td>
      </tr>
      <tr>
          <td colspan="2"><input type="button" name="edit" value="Edit Settings" onclick="window.location.href='workgroup-queue-manage.jsp?wgID=<%=wgID%>&qID=<%= queueID%>'"/></td>

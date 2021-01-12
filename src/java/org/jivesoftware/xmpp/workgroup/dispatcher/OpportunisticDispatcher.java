@@ -30,9 +30,9 @@ import java.util.stream.Collectors;
  *
  * @author Guus der Kinderen, guus@goodbytes.nl
  */
-public class FloodingDispatcher extends AbstractDispatcher
+public class OpportunisticDispatcher extends AbstractDispatcher
 {
-    private static final Logger Log = LoggerFactory.getLogger(FloodingDispatcher.class);
+    private static final Logger Log = LoggerFactory.getLogger(OpportunisticDispatcher.class);
 
     /**
      * Creates a new dispatcher for the queue. The dispatcher will have a Timer with a unique task
@@ -41,7 +41,7 @@ public class FloodingDispatcher extends AbstractDispatcher
      * @param queue the queue that contains the requests and the agents that may attend the
      *              requests.
      */
-    public FloodingDispatcher(RequestQueue queue) {
+    public OpportunisticDispatcher(RequestQueue queue) {
         super(queue);
     }
 

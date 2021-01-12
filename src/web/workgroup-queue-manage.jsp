@@ -9,6 +9,8 @@ import   ="java.util.*,
            org.jivesoftware.xmpp.workgroup.dispatcher.DispatcherInfo,
            org.jivesoftware.util.ParamUtils"
 errorPage="workgroup-error.jsp"%>
+<%@ page import="org.jivesoftware.xmpp.workgroup.dispatcher.Dispatcher" %>
+<%@ page import="org.jivesoftware.openfire.fastpath.util.WorkgroupUtils" %>
 <%
     // Get parameters //
     String wgID = ParamUtils.getParameter(request, "wgID");
@@ -22,6 +24,7 @@ errorPage="workgroup-error.jsp"%>
     boolean update = request.getParameter("update") != null;
     int overflow = ParamUtils.getIntParameter(request, "overflow", 1);
     long overflowQID = ParamUtils.getLongParameter(request, "overflowQID", -1L);
+    String dispatcherClassName = ParamUtils.getParameter(request, "dispatcherClassName");
 
 
     WorkgroupManager wgManager = WorkgroupManager.getInstance();
@@ -72,12 +75,23 @@ errorPage="workgroup-error.jsp"%>
             errors.put("name","");
         }
 
-        else {
-
+        Class<? extends Dispatcher> dispatcherClass = null;
+        if (dispatcherClassName != null && !dispatcherClassName.isEmpty()) {
+            try {
+                dispatcherClass = WorkgroupUtils.loadClass(dispatcherClassName);
+                if (!WorkgroupUtils.getAvailableDispatcherClasses().contains(dispatcherClass)) {
+                    errors.put("dispatcherClassName", "not-available");
+                }
+            } catch (Exception e) {
+                errors.put("dispatcherClassName", e.getMessage());
+            }
         }
+
         if (errors.size() == 0) {
             queue.setName(name);
             queue.setDescription(description);
+            queue.setDispatcher(dispatcherClass);
+
             // set timeouts
             DispatcherInfo infos = queue.getDispatcher().getDispatcherInfo();
 
@@ -316,7 +330,40 @@ administrators and agents with identifying a particular request queue.
         </table>
     </td>
 </tr>
-</table>
+
+
+<tr valign="top">
+    <td class="c1">
+        <b>Dispatcher type: *</b>
+        <%  if (errors.get("dispatcherClassName") != null) { %>
+        &nbsp;
+        <span class="jive-error-text">
+    Please select a valid value.
+    </span>
+
+        <%  } %>
+        <br/>
+        <span class="jive-description">Defines how requests are offered to agents.</span>
+    </td>
+    <td class="c2">
+        <% final Class<? extends Dispatcher> currentClass = queue.getDispatcherClass(); %>
+        <select name="dispatcherClassName" id="dispatcherClassName">
+            <option value="" <%= currentClass == null ? "selected":""%>>Default (<%=WorkgroupUtils.humanReadableDispatcherName(queue.getDefaultDispatcherClass())%>)</option>
+        <%
+            final List<Class<? extends Dispatcher>> availableClasses = WorkgroupUtils.getAvailableDispatcherClasses();
+            for( final Class<? extends Dispatcher> availableClass : availableClasses) {
+        %>
+            <option value="<%=availableClass.getName()%>" <%= availableClass.equals(currentClass) ? "selected":""%>><%=WorkgroupUtils.humanReadableDispatcherName(availableClass)%></option>
+        <%
+            }
+        %>
+        </select>
+    </td>
+</tr>
+
+
+
+    </table>
 
 <br>
 

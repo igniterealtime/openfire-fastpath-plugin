@@ -40,6 +40,9 @@ import org.jivesoftware.xmpp.workgroup.UserAlreadyExistsException;
 import org.jivesoftware.xmpp.workgroup.Workgroup;
 import org.jivesoftware.xmpp.workgroup.WorkgroupManager;
 import org.jivesoftware.xmpp.workgroup.dispatcher.AgentSelector;
+import org.jivesoftware.xmpp.workgroup.dispatcher.Dispatcher;
+import org.jivesoftware.xmpp.workgroup.dispatcher.OpportunisticDispatcher;
+import org.jivesoftware.xmpp.workgroup.dispatcher.RoundRobinDispatcher;
 import org.jivesoftware.xmpp.workgroup.spi.dispatcher.BasicAgentSelector;
 import org.jivesoftware.xmpp.workgroup.utils.ModelUtil;
 import org.slf4j.Logger;
@@ -125,6 +128,28 @@ public class WorkgroupUtils {
         return returnString;
     }
 
+    public synchronized static List<Class<? extends Dispatcher>> getAvailableDispatcherClasses() {
+        final List<Class<? extends Dispatcher>> result = new ArrayList<>();
+
+        // First, add in build-in list of dispatchers.
+        result.addAll(getBuiltInDispatcherClasses());
+
+        // Now get custom algorithms.
+        List<String> classNames = JiveGlobals.getProperties("dispatcher.classes");
+        for (String className : classNames) {
+            try {
+                Class<? extends Dispatcher> dispatcherClass = loadClass(className);
+                // Make sure that the class isn't already present.
+                if (!result.contains(dispatcherClass)) {
+                    result.add(dispatcherClass);
+                }
+            } catch (Exception e) {
+                Log.error("An exception occurred while trying to load class with name '{}' from property 'dispatcher.classes'", className, e);
+            }
+        }
+        return result;
+    }
+
     public synchronized static List<AgentSelector> getAvailableAgentSelectors() {
         List<AgentSelector> answer = new ArrayList<AgentSelector>();
         // First, add in built-in list of algorithms.
@@ -164,7 +189,17 @@ public class WorkgroupUtils {
         return Arrays.asList((Class)BasicAgentSelector.class);
     }
 
-    private static Class loadClass(String className) throws ClassNotFoundException {
+    public static String humanReadableDispatcherName(final Class<? extends Dispatcher> dispatcherClass) {
+        String name = dispatcherClass.getSimpleName();
+        name = name.replace("Dispatcher", "");
+        return name.replaceAll("([A-Z])", " $1").trim();
+    }
+
+    private static Collection<Class<? extends Dispatcher>> getBuiltInDispatcherClasses() {
+        return Arrays.asList(RoundRobinDispatcher.class, OpportunisticDispatcher.class); // Note that the first element is used as a default.
+    }
+
+    public static Class loadClass(String className) throws ClassNotFoundException {
         try {
             return ClassUtils.forName(className);
         }
