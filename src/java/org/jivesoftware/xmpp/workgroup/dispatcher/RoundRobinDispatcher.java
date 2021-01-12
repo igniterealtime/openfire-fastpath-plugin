@@ -53,6 +53,7 @@ public class RoundRobinDispatcher extends AbstractDispatcher {
     @Override
     protected void sendToAgent(final Offer offer, final Instant timeout, AgentSession initialAgent, AgentSession ignoreAgent)
     {
+        Log.debug("Offer for request: {} Attempting to find best agent", offer.getRequest());
         final Request request = offer.getRequest();
         boolean canBeInQueue = request instanceof UserRequest;
 
@@ -152,8 +153,11 @@ public class RoundRobinDispatcher extends AbstractDispatcher {
      */
     private AgentSession getBestNextAgent(AgentSession initialAgent, AgentSession ignoreAgent, Offer offer)
     {
+        Log.debug("Agent selection for receiving offer for request: {}", offer.getRequest());
+
         // Look for specified agent in agent list
         if (initialAgent != null) {
+            Log.trace("Initial agent specified: {}", initialAgent.getJID());
             Workgroup workgroup = offer.getRequest().getWorkgroup();
             if (initialAgent.isAvailableToChat() &&
                 initialAgent.getCurrentChats(workgroup) < initialAgent.getMaxChats(workgroup)) {
@@ -167,19 +171,26 @@ public class RoundRobinDispatcher extends AbstractDispatcher {
         final List<AgentSession> possibleSessions = new ArrayList<>();
         for (AgentSession agentSession : agentSessionList.getAgentSessions()) {
             if (agentSession.equals(ignoreAgent)) {
+                Log.trace("Ignoring agent: {}", agentSession.getJID());
                 continue;
             }
+
             if (validateAgent(agentSession, offer)) {
                 possibleSessions.add(agentSession);
+                Log.trace("Considering agent: {}", agentSession.getJID());
+            } else {
+                Log.trace("Not considering agent: {}", agentSession.getJID());
             }
         }
 
         // Select the best agent from the list of possible agents
         if (possibleSessions.size() > 0) {
             AgentSession s = agentSelector.bestAgentFrom(possibleSessions, offer);
-            Log.debug("Agent SELECTED: {} for receiving offer for request: {}", s.getJID(), offer.getRequest());
+            Log.trace("Agent SELECTED: {} for receiving offer for request: {}", s.getJID(), offer.getRequest());
             return s;
         }
+
+        Log.debug("Unable to select agent for receiving offer for request: {}", offer.getRequest());
         return null;
     }
 }
