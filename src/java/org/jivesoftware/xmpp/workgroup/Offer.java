@@ -209,16 +209,19 @@ public class Offer {
                 // do nothing
             }
         }
-        if (!isAccepted()) {
-            try {
-                for (AgentSession session : pendingSessions) {
-                    request.sendRevoke(session, queue);
+
+        // Accepted or not: send a revocation to all pending sessions.
+        try {
+            for (AgentSession session : pendingSessions) {
+                request.sendRevoke(session, queue);
+
+                if (!isAccepted()) {
                     reject(session);
                 }
             }
-            catch (Exception e) {
-                // Ignore
-            }
+        }
+        catch (Exception e) {
+            // Ignore
         }
     }
 
