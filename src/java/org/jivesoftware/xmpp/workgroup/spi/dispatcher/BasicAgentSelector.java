@@ -4,6 +4,8 @@ import org.jivesoftware.xmpp.workgroup.AgentSession;
 import org.jivesoftware.xmpp.workgroup.Offer;
 import org.jivesoftware.xmpp.workgroup.Workgroup;
 import org.jivesoftware.xmpp.workgroup.dispatcher.AgentSelector;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -25,6 +27,8 @@ import java.util.List;
  */
 public class BasicAgentSelector implements AgentSelector {
 
+    private static final Logger Log = LoggerFactory.getLogger(BasicAgentSelector.class);
+
     /**
      * Returns true if the agent session may receive an offer. An agent session may receive new
      * offers if:
@@ -32,13 +36,24 @@ public class BasicAgentSelector implements AgentSelector {
      * 1) the presence status of the agent allows to receive offers
      * 2) the maximum of chats has not been reached for the agent
      * 3) the agent has not rejected the offer before
-     * 4) the agent does not have to answer a previuos offer
+     * 4) the agent does not have to answer a previous offer
      */
     public boolean validateAgent(AgentSession session, Offer offer) {
         Workgroup workgroup = offer.getRequest().getWorkgroup();
-        return session != null && session.isAvailableToChat() &&
-                session.getCurrentChats(workgroup) < session.getMaxChats(workgroup) && !offer.isRejector(session) &&
-                !session.isWaitingOfferAnswer();
+        final boolean agentSessionExists = session != null;
+        final boolean isAvailableToChat = session != null && session.isAvailableToChat();
+        final boolean doesntHaveToManyChats =  session != null && session.getCurrentChats(workgroup) < session.getMaxChats(workgroup);
+        final boolean hasNotPreviouslyRejectedThisOffer = session != null && !offer.isRejector(session);
+        final boolean shouldNotAnswerPreviousOfferFirst = session != null && !session.isWaitingOfferAnswer();
+
+        final boolean result = agentSessionExists && isAvailableToChat && doesntHaveToManyChats && hasNotPreviouslyRejectedThisOffer && shouldNotAnswerPreviousOfferFirst;
+        Log.trace("Agent {} session exists: {}", session == null ? "NULL" : session.getJID(), agentSessionExists);
+        Log.trace("Agent {} is available to chat: {}", session == null ? "NULL" : session.getJID(), isAvailableToChat);
+        Log.trace("Agent {} doesn't have to many existing chats: {}", session == null ? "NULL" : session.getJID(), doesntHaveToManyChats);
+        Log.trace("Agent {} has not previously rejected this offer: {}", session == null ? "NULL" : session.getJID(), hasNotPreviouslyRejectedThisOffer);
+        Log.trace("Agent {} does not have to answer a previous offer first: {}", session == null ? "NULL" : session.getJID(), shouldNotAnswerPreviousOfferFirst);
+        Log.debug("Agent {} may receive offer for request: {}? {} (reasoning logged on level TRACE).", new Object[] {session == null ? "NULL" : session.getJID(), offer.getRequest(), result});
+        return result;
     }
 
     /**
