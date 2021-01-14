@@ -65,6 +65,8 @@ public abstract class AbstractDispatcher implements Dispatcher, AgentSessionList
     protected DispatcherInfo info;
     protected AgentSelector agentSelector = WorkgroupUtils.getAvailableAgentSelectors().get(0);
 
+    private final TimerTask checkForNewRequestsTask;
+
     /**
      * Creates a new dispatcher for the queue. The dispatcher will have a Timer with a unique task
      * that will get the requests from the queue and will try to send an offer to the agents.
@@ -91,12 +93,13 @@ public abstract class AbstractDispatcher implements Dispatcher, AgentSessionList
         // the queue
         fillAgentsList();
 
-        TaskEngine.getInstance().scheduleAtFixedRate(new TimerTask() {
+        checkForNewRequestsTask = new TimerTask() {
             @Override
             public void run() {
                 checkForNewRequests();
             }
-        }, 2000, 2000);
+        };
+        TaskEngine.getInstance().scheduleAtFixedRate(checkForNewRequestsTask, 2000, 2000);
     }
 
     /**
@@ -477,6 +480,7 @@ public abstract class AbstractDispatcher implements Dispatcher, AgentSessionList
 
     @Override
     public void shutdown() {
+        checkForNewRequestsTask.cancel();
         for (final Offer offer : offers) {
             offer.cancel();
         }
