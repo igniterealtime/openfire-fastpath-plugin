@@ -85,12 +85,12 @@ public class OpportunisticDispatcher extends AbstractDispatcher
             // Notify the other agents tat accepted that the offer process has finished. Other pending sessions will
             // already have been notified.
             for (AgentSession offeredAgent : offeredAgents) {
+                offeredAgent.removeOffer(offer);
                 if (offeredAgent.equals(selectedAgent)) {
                     continue;
                 }
-                Log.debug("Offer for request: {} REVOKING from agent that also accepted: {}", offer.getRequest(), offeredAgent.getJID());
+                Log.debug("Offer for request: {} REVOKING from agent that was also offered this request: {}", offer.getRequest(), offeredAgent.getJID());
                 offer.getRequest().sendRevoke(offeredAgent, queue);
-                offeredAgent.removeOffer(offer);
             }
 
             if (offer.getRequest() instanceof UserRequest) {
