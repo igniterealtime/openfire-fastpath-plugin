@@ -58,6 +58,9 @@
                            <item id="workgroup-properties" name="Settings"
                                  url="workgroup-properties.jsp"
                                  description="Click to view workgroup properties"/>
+                           <item id="workgroup-chatbot" name="Chatbot"
+                                 url="workgroup-chatbot.jsp"
+                                 description="Click to configure chatbot properties"/>
                        </sidebar>
                    </item>
                </sidebar>

@@ -75,9 +75,15 @@
             document.text3.submit();
         }
         </script>
-        <script language="javascript">
+        <script>
             function changeImage(image, img) {
                 img.src = image;
+            }
+        </script>
+        <script>
+            function textAreaAdjust(element) {
+                element.style.height = "1px";
+                element.style.height = (25+element.scrollHeight)+"px";
             }
         </script>
     </head>
@@ -179,10 +185,10 @@
                     ChatSetting setting = (ChatSetting)iter.next();
             %>
             <tr valign="top">
-                 <td width="25%"><%= setting.getLabel() %></td>
-                 <td><textarea cols="25" rows="5" name="<%= setting.getKey() %>"><%= setting.getValue() %></textarea></td>
-                 <td><%= setting.getDefaultValue() %></td>
-                 <td><input type="submit" name="restore" value="Restore Defaults" onClick="restoreKey('<%=setting.getKey()%>');"></td>
+                 <td style="width: 15%"><%= setting.getLabel() %></td>
+                 <td style="width: 42%"><textarea onkeyup="textAreaAdjust(this)" style="width: 100%; overflow:hidden" name="<%= setting.getKey() %>"><%= setting.getValue() %></textarea></td>
+                 <td style="width: 42%"><%= setting.getDefaultValue() %></td>
+                 <td style="width: 1%; white-space: nowrap;"><input type="submit" name="restore" value="Restore Defaults" onClick="restoreKey('<%=setting.getKey()%>');"></td>
                  <input type="hidden" name="key" value="<%= setting.getKey() %>" />
             </tr>
             <% } %>
