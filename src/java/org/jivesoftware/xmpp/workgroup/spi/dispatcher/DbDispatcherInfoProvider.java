@@ -20,6 +20,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.Duration;
 
 import org.jivesoftware.database.DbConnectionManager;
 import org.jivesoftware.util.LocaleUtils;
@@ -81,8 +82,9 @@ public class DbDispatcherInfoProvider implements DispatcherInfoProvider {
                     queueID,
                     rs.getString(1), // name
                     rs.getString(2), // description
-                    rs.getInt(3), // offer timeout
-                    rs.getInt(4)); // request timeout
+                    Duration.ofMillis(rs.getInt(3)), // offer timeout
+                    Duration.ofMillis(rs.getInt(4)) // request timeout
+            );
 
         }
         catch (SQLException e) {
@@ -116,8 +118,8 @@ public class DbDispatcherInfoProvider implements DispatcherInfoProvider {
             pstmt = con.prepareStatement(UPDATE_DISPATCHER);
             pstmt.setString(1, info.getName());
             pstmt.setString(2, info.getDescription());
-            pstmt.setInt(3, (int)info.getOfferTimeout());
-            pstmt.setInt(4, (int)info.getRequestTimeout());
+            pstmt.setInt(3, (int) info.getOfferTimeout().toMillis());
+            pstmt.setInt(4, (int) info.getRequestTimeout().toMillis());
             pstmt.setLong(5, queueID);
             pstmt.executeUpdate();
         }
@@ -145,8 +147,8 @@ public class DbDispatcherInfoProvider implements DispatcherInfoProvider {
             pstmt = con.prepareStatement(INSERT_DISPATCHER);
             pstmt.setString(1, info.getName());
             pstmt.setString(2, info.getDescription());
-            pstmt.setInt(3, (int)info.getOfferTimeout());
-            pstmt.setInt(4, (int)info.getRequestTimeout());
+            pstmt.setInt(3, (int)info.getOfferTimeout().toMillis());
+            pstmt.setInt(4, (int)info.getRequestTimeout().toMillis());
             pstmt.setLong(5, queueID);
             pstmt.executeUpdate();
         }

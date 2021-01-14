@@ -16,6 +16,8 @@
 
 package org.jivesoftware.xmpp.workgroup.request;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Arrays;
 
 import org.dom4j.DocumentHelper;
@@ -50,7 +52,7 @@ public class TransferRequest extends Request {
      * Time limit to wait for the invitee to join the support room. The limit is verified once the agent
      * accepted the offer or a MUC invitation was sent to the user.
      */
-    private static final long JOIN_TIMEOUT = 60 * 1000;
+    private static final Duration JOIN_TIMEOUT = Duration.ofMinutes(1);
 
     private Type type;
     private String sessionID;
@@ -75,7 +77,7 @@ public class TransferRequest extends Request {
      * This information will be used to monitor if user actually joined the support room before the limit
      * timeout is reached.
      */
-    private long offerAccepted;
+    private Instant offerAccepted = Instant.EPOCH;
 
     public TransferRequest(IQ packet, Workgroup workgroup) {
         super();
@@ -130,7 +132,7 @@ public class TransferRequest extends Request {
                 // Invitee is not an agent so send a standard MUC room invitation
                 sendMUCInvitiation();
                 // Keep track when the invitation was sent to the user
-                offerAccepted = System.currentTimeMillis();
+                offerAccepted = Instant.now();
             }
             else {
                 // Invite the agent to the room by sending an offer
@@ -180,7 +182,7 @@ public class TransferRequest extends Request {
 
 
     @Override
-    public void updateSession(int state, long offerTime) {
+    public void updateSession(int state, Instant offerTime) {
         // Ignore
     }
 
@@ -188,7 +190,7 @@ public class TransferRequest extends Request {
     public void offerAccepted(AgentSession agentSession) {
         super.offerAccepted(agentSession);
         // Keep track when the offer was accepted by the agent
-        offerAccepted = System.currentTimeMillis();
+        offerAccepted = Instant.now();
     }
 
     @Override
@@ -258,7 +260,7 @@ public class TransferRequest extends Request {
     @Override
     public void checkRequest(String roomID) {
         // Monitor that the agent/user joined the room and if not send back an error to the inviter
-        if (offerAccepted > 0 && !hasJoinedRoom() && System.currentTimeMillis() - offerAccepted > JOIN_TIMEOUT) {
+        if (offerAccepted.isAfter( Instant.EPOCH ) && !hasJoinedRoom() && Duration.between(offerAccepted, Instant.now()).compareTo(JOIN_TIMEOUT) > 0) {
             Log.debug("Agent or user failed to join room "+roomID);
             // Send error message to inviter
             sendErrorMessage("Agent or user failed to join the room.");

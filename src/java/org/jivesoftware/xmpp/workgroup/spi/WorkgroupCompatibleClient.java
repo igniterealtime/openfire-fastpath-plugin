@@ -72,7 +72,7 @@ public class WorkgroupCompatibleClient implements UserCommunicationMethod {
 
         // Add Time Element
         Element time = status.addElement("time");
-        time.setText(Integer.toString(request.getTimeStatus()));
+        time.setText(Long.toString(request.getTimeStatus().getSeconds())); // Replace with 'toSeconds' in Java 9+
 
         // Add Position Element
         Element position = status.addElement("position");

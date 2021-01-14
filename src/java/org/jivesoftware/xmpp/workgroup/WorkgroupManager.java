@@ -21,6 +21,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -127,8 +128,8 @@ public class WorkgroupManager implements Component {
 
     private int defaultMaxChats = 4; // default value, usually overridden by config file
     private int defaultMinChats = 1;
-    private long defaultOfferTimeout = 20 * 1000; // 20 seconds
-    private long defaultRequestTimeout = 4 * 60 * 1000; // 4 minutes
+    private Duration defaultOfferTimeout = Duration.ofSeconds(20);
+    private Duration defaultRequestTimeout = Duration.ofMinutes(4);
 
     /**
      * <p>Simple flag to track whether the workgroups have been loaded or not.</p>
@@ -177,10 +178,10 @@ public class WorkgroupManager implements Component {
         String offerTimeout = JiveGlobals.getProperty("xmpp.live.defaults.offerTimeout");
         String requestTimeout = JiveGlobals.getProperty("xmpp.live.defaults.requestTimeout");
         if (offerTimeout != null && offerTimeout.trim().length() > 0) {
-            defaultOfferTimeout = Integer.parseInt(offerTimeout);
+            defaultOfferTimeout = Duration.ofMillis(Integer.parseInt(offerTimeout));
         }
         if (requestTimeout != null && requestTimeout.trim().length() > 0) {
-            defaultRequestTimeout = Integer.parseInt(requestTimeout);
+            defaultRequestTimeout = Duration.ofMillis(Integer.parseInt(requestTimeout));
         }
 
         // Initialize chat settings manager. TODO This will be moved over to an extension file.
@@ -280,27 +281,27 @@ public class WorkgroupManager implements Component {
         }
     }
 
-    public long getDefaultOfferTimeout() {
+    public Duration getDefaultOfferTimeout() {
         return defaultOfferTimeout;
     }
 
-    public void setDefaultOfferTimeout(long defaultOfferTimeout) {
-        if (defaultOfferTimeout >= 0) {
+    public void setDefaultOfferTimeout(Duration defaultOfferTimeout) {
+        if (!defaultOfferTimeout.isNegative()) {
             this.defaultOfferTimeout = defaultOfferTimeout;
             JiveGlobals.setProperty("xmpp.live.defaults.offerTimeout",
-                Long.toString(defaultOfferTimeout));
+                Long.toString(defaultOfferTimeout.toMillis()));
         }
     }
 
-    public long getDefaultRequestTimeout() {
+    public Duration getDefaultRequestTimeout() {
         return defaultRequestTimeout;
     }
 
-    public void setDefaultRequestTimeout(long defaultRequestTimeout) {
-        if (defaultRequestTimeout >= 0) {
+    public void setDefaultRequestTimeout(Duration defaultRequestTimeout) {
+        if (!defaultRequestTimeout.isNegative()) {
             this.defaultRequestTimeout = defaultRequestTimeout;
             JiveGlobals.setProperty("xmpp.live.defaults.requestTimeout",
-                Long.toString(defaultRequestTimeout));
+                Long.toString(defaultRequestTimeout.toMillis()));
         }
     }
 

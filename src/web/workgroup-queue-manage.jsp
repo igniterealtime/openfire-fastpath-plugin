@@ -11,6 +11,7 @@ import   ="java.util.*,
 errorPage="workgroup-error.jsp"%>
 <%@ page import="org.jivesoftware.xmpp.workgroup.dispatcher.Dispatcher" %>
 <%@ page import="org.jivesoftware.openfire.fastpath.util.WorkgroupUtils" %>
+<%@ page import="java.time.Duration" %>
 <%
     // Get parameters //
     String wgID = ParamUtils.getParameter(request, "wgID");
@@ -35,13 +36,13 @@ errorPage="workgroup-error.jsp"%>
 
     long offerTimeout = ParamUtils.getLongParameter(request, "offerTimeout", -1);
     if (offerTimeout == -1) {
-        offerTimeout = workgroup.getOfferTimeout() / 1000;
+        offerTimeout = workgroup.getOfferTimeout().getSeconds();
     }
 
 
     long requestTimeout = ParamUtils.getLongParameter(request, "requestTimeout", -1);
     if (requestTimeout == -1) {
-        requestTimeout = workgroup.getRequestTimeout() / 1000;
+        requestTimeout = workgroup.getRequestTimeout().getSeconds();
     }
 
     AgentManager aManager = wgManager.getAgentManager();
@@ -95,8 +96,8 @@ errorPage="workgroup-error.jsp"%>
             // set timeouts
             DispatcherInfo infos = queue.getDispatcher().getDispatcherInfo();
 
-            infos.setOfferTimeout(offerTimeout*1000L);
-            infos.setRequestTimeout(requestTimeout*1000L);
+            infos.setOfferTimeout(Duration.ofSeconds(offerTimeout));
+            infos.setRequestTimeout(Duration.ofSeconds(requestTimeout));
             queue.getDispatcher().setDispatcherInfo(infos);
         }
 
@@ -116,8 +117,8 @@ errorPage="workgroup-error.jsp"%>
         name = queue.getName();
         description = queue.getDescription();
         DispatcherInfo dispatcherInfo = queue.getDispatcher().getDispatcherInfo();
-        offerTimeout = dispatcherInfo.getOfferTimeout();
-        requestTimeout = dispatcherInfo.getRequestTimeout();
+        offerTimeout = dispatcherInfo.getOfferTimeout().toMillis();
+        requestTimeout = dispatcherInfo.getRequestTimeout().toMillis();
 
         overflowType = queue.getOverflowType();
         if (overflowType == RequestQueue.OverflowType.OVERFLOW_BACKUP) {

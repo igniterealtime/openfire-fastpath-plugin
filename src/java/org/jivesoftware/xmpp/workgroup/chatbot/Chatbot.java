@@ -16,6 +16,7 @@
 
 package org.jivesoftware.xmpp.workgroup.chatbot;
 
+import java.time.Duration;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -804,10 +805,24 @@ public class Chatbot implements UserCommunicationMethod {
             }
             String body = getPositionMessage().replace("${position}",
                     String.valueOf(request.getPosition()  +  1));
-            body = body.replace("${waitTime}", String.valueOf(request.getTimeStatus()));
+            body = body.replace("${waitTime}", humanReadableFormat(request.getTimeStatus()));
             packet.setBody(body);
             send(packet);
         }
+    }
+
+    /**
+     * Formats a Duration into something that's human readable (examples: 5h, 7h 14m, 0.1s).
+     *
+     * @param duration Duration to be represented in human readable form.
+     * @return A human readable string.
+     * @see <a href="https://stackoverflow.com/a/40487511/189203">https://stackoverflow.com/a/40487511/189203</a>
+     */
+    public static String humanReadableFormat(Duration duration) {
+        return duration.toString()
+            .substring(2)
+            .replaceAll("(\\d[HMS])(?!$)", "$1 ")
+            .toLowerCase();
     }
 
     public void notifyQueueDepartued(JID sender, JID receiver, UserRequest request,

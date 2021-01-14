@@ -16,6 +16,7 @@
 
 package org.jivesoftware.xmpp.workgroup.request;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -36,7 +37,6 @@ import org.jivesoftware.xmpp.workgroup.Offer;
 import org.jivesoftware.xmpp.workgroup.RequestQueue;
 import org.jivesoftware.xmpp.workgroup.Workgroup;
 import org.jivesoftware.xmpp.workgroup.utils.FastpathConstants;
-import org.jivesoftware.xmpp.workgroup.chatbot.Chatbot;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xmpp.packet.IQ;
@@ -55,7 +55,7 @@ public abstract class Request {
 
     protected final String requestID;
 
-    private Date creationTime;
+    private Instant creationTime;
     /**
      * Timestamp that indicates when the last user joined the support MUC room.
      */
@@ -99,7 +99,7 @@ public abstract class Request {
     }
 
     protected Request() {
-        creationTime = new Date();
+        creationTime = Instant.now();
         requestID = newRequestID();
     }
 
@@ -119,7 +119,7 @@ public abstract class Request {
         return notify;
     }
 
-    public Date getCreationTime() {
+    public Instant getCreationTime() {
         return creationTime;
     }
 
@@ -195,7 +195,7 @@ public abstract class Request {
      * @param state the state of this session.
      * @param offerTime the new offer time.
      */
-    public abstract void updateSession(int state, long offerTime);
+    public abstract void updateSession(int state, Instant offerTime);
 
     /**
      * Notification event indicating that an agent has accepted the offer. Subclasses should
@@ -234,7 +234,7 @@ public abstract class Request {
         offerElement.add(metaDataElement);
 
         Element timeoutElement = offerElement.addElement("timeout");
-        timeoutElement.setText(Long.toString(offer.getTimeout() / 1000));
+        timeoutElement.setText(Long.toString(offer.getTimeout().getSeconds())); // TODO: replace with 'toSeconds' after the minimum version of Java is 9.
 
         offerElement.add(getSessionElement());
         addOfferContent(offerElement);

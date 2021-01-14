@@ -8,6 +8,7 @@ errorPage="workgroup-error.jsp"%>
 <%@ page import="org.xmpp.packet.JID"%>
 <%@ page import="java.util.HashMap"%>
 <%@ page import="java.util.Map, org.jivesoftware.openfire.fastpath.util.WorkgroupUtils, org.jivesoftware.openfire.fastpath.dataforms.FormManager, org.jivesoftware.openfire.fastpath.dataforms.WorkgroupForm, org.jivesoftware.openfire.fastpath.dataforms.FormElement"%>
+<%@ page import="java.time.Duration" %>
 <%
     // Get parameters //
     String wgID = ParamUtils.getParameter(request, "wgID");
@@ -51,8 +52,8 @@ errorPage="workgroup-error.jsp"%>
     Workgroup workgroup = wgManager.getWorkgroup(workgroupJID);
     int maxChats = workgroup.getMaxChats();
     int minChats = workgroup.getMinChats();
-    long requestTimeout = workgroup.getRequestTimeout() / 1000;
-    long offerTimeout = workgroup.getOfferTimeout() / 1000;
+    long requestTimeout = workgroup.getRequestTimeout().getSeconds();
+    long offerTimeout = workgroup.getOfferTimeout().getSeconds();
     String description = workgroup.getDescription();
     String displayName = workgroup.getDisplayName();
     boolean authRequired = Boolean.valueOf(workgroup.getProperties().getProperty("authRequired"));
@@ -85,10 +86,10 @@ errorPage="workgroup-error.jsp"%>
 
 
         requestTimeout = ParamUtils.getLongParameter(request, "requestTimeout",
-                wgManager.getDefaultRequestTimeout() / 1000) * 1000;
+                wgManager.getDefaultRequestTimeout().getSeconds()) * 1000;
 
         offerTimeout = ParamUtils.getLongParameter(request, "offerTimeout",
-                wgManager.getDefaultOfferTimeout() / 1000) * 1000;
+                wgManager.getDefaultOfferTimeout().getSeconds()) * 1000;
 
         authRequired = ParamUtils.getBooleanParameter(request, "authRequired", false);
 
@@ -111,9 +112,9 @@ errorPage="workgroup-error.jsp"%>
         if (errors.size() == 0) {
             description = request.getParameter("description");
             statusMessage = WorkgroupUtils.updateWorkgroup(wgID, displayName, description, maxChats,
-                    minChats, requestTimeout, offerTimeout);
-            requestTimeout = workgroup.getRequestTimeout() / 1000;
-            offerTimeout = workgroup.getOfferTimeout() / 1000;
+                    minChats, Duration.ofMillis(requestTimeout), Duration.ofMillis(offerTimeout));
+            requestTimeout = workgroup.getRequestTimeout().getSeconds();
+            offerTimeout = workgroup.getOfferTimeout().getSeconds();
             workgroup.getProperties().setProperty("authRequired", String.valueOf(authRequired));
 
             FormManager formManager = FormManager.getInstance();

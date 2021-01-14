@@ -21,6 +21,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArraySet;
 
@@ -87,7 +90,7 @@ public class RequestQueue {
     /**
      * The current average time a request spends in this queue.
      */
-    private int averageTime;
+    private Duration averageTime = Duration.ZERO;
 
     /**
      * The workgroup this queue belongs to.
@@ -266,20 +269,18 @@ public class RequestQueue {
         }
         totalRequestCount++;
         if (request.getOffer() == null || !request.getOffer().isCancelled()) {
-            int waitTime = (int)(System.currentTimeMillis()
-                    - request.getCreationTime().getTime()) / 1000;
-            if (averageTime == 0) {
+            Duration waitTime = Duration.between(request.getCreationTime(), Instant.now());
+            if (averageTime.isZero()) {
                 averageTime = waitTime;
             }
-            averageTime = (averageTime + waitTime) / 2;
+            averageTime = averageTime.plus(waitTime).dividedBy(2); // ... 'average'
             totalChatCount++;
         }
         else {
-            final int timeout = (int)request.getOffer().getTimeout() / 1000;
-            int waitTime = (int)(System.currentTimeMillis()
-                    - request.getCreationTime().getTime()) / 1000;
+            final Duration timeout = request.getOffer().getTimeout();
+            Duration waitTime = Duration.between(request.getCreationTime(), Instant.now());
 
-            if (waitTime > timeout) {
+            if (waitTime.compareTo(timeout) > 0) {
                 // This was never left and timed-out
                 totalDroppedRequests++;
             }
@@ -352,7 +353,7 @@ public class RequestQueue {
         }
 
         Element timeElement = status.addElement("time");
-        timeElement.setText(Integer.toString(getAverageTime()));
+        timeElement.setText(Long.toString(getAverageTime().getSeconds())); // Use 'toSeconds' after moving to Java 9.
         Element statusElement = status.addElement("status");
 
         if (workgroup.getStatus() == Workgroup.Status.OPEN && presenceAvailable) {
@@ -399,7 +400,7 @@ public class RequestQueue {
                 position.setText(Integer.toString(i));
 
                 Element time = user.addElement("time");
-                time.setText(Integer.toString(request.getTimeStatus()));
+                time.setText(Long.toString(request.getTimeStatus().getSeconds())); // Replace with 'toSeconds' after moving to Java 9.
 
                 Element joinTime = user.addElement("join-time");
                 joinTime.setText(UTC_FORMAT.format(request.getCreationTime()));
@@ -434,7 +435,7 @@ public class RequestQueue {
     // #################################################################
     // Standard formatting according to locale and Jabber specs
     // #################################################################
-    private static final FastDateFormat UTC_FORMAT = FastDateFormat.getInstance("yyyyMMdd'T'HH:mm:ss", TimeZone.getTimeZone("UTC"));
+    private static final DateTimeFormatter UTC_FORMAT = DateTimeFormatter.ofPattern("yyyyMMdd'T'HH:mm:ss").withZone(TimeZone.getTimeZone("UTC").toZoneId());
 
     // ###########################################################################
     // Misc queue runtime properties
@@ -443,7 +444,7 @@ public class RequestQueue {
         return activeAgents;
     }
 
-    public int getAverageTime() {
+    public Duration getAverageTime() {
         return averageTime;
     }
 

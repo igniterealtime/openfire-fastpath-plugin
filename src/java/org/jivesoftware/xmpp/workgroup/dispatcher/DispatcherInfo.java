@@ -18,6 +18,8 @@ package org.jivesoftware.xmpp.workgroup.dispatcher;
 
 import org.jivesoftware.xmpp.workgroup.UnauthorizedException;
 
+import java.time.Duration;
+
 /**
  * Information about a dispatcher.<p>
  *
@@ -72,32 +74,31 @@ public interface DispatcherInfo {
     void setDescription(String description) throws UnauthorizedException;
 
     /**
-     * Sets the amount of time in milliseconds a request waits in the queue before being rejected.
+     * Sets the amount of time a request waits in the queue before being rejected.
      *
-     * @param timeout The amount of time in milliseconds before requests are timed out
+     * @param timeout The amount of time before requests are timed out
      */
-    void setRequestTimeout(long timeout);
+    void setRequestTimeout(Duration timeout);
 
     /**
-     * Obtains the amount of time in milliseconds a request waits in the queue before being
+     * Obtains the amount of time a request waits in the queue before being
      * rejected.
      *
-     * @return The amount of time in milliseconds before requests are timed out
+     * @return The amount of time before requests are timed out
      */
-    long getRequestTimeout();
+    Duration getRequestTimeout();
 
     /**
-     * Sets the amount of time in milliseconds an offer is made before being revoked.
+     * Sets the amount of time an offer is made before being revoked.
      *
-     * @param timeout The amount of time in milliseconds before requests are timed out
+     * @param timeout The amount of time before requests are timed out
      */
-    void setOfferTimeout(long timeout);
+    void setOfferTimeout(Duration timeout);
 
     /**
-     * Obtains the amount of time in milliseconds an offer is made before being revoked.
+     * Obtains the amount of time an offer is made before being revoked.
      *
-     * @return The amount of time in milliseconds before requests are timed out
+     * @return The amount of time before requests are timed out
      */
-    long getOfferTimeout();
-
+    Duration getOfferTimeout();
 }
