@@ -182,10 +182,10 @@ public class ChatSettingsCreator {
         labelMap.put(KeyEnum.email_sent_message, "Email was sent to the user");
 
         botMap.put(KeyEnum.command_accepted_message, "Please stand by for group chat invitation");
-        labelMap.put(KeyEnum.command_accepted_message, "Comand ok response");
+        labelMap.put(KeyEnum.command_accepted_message, "Command ok response");
 
         botMap.put(KeyEnum.command_rejected_message, "Command refused");
-        labelMap.put(KeyEnum.command_rejected_message, "Comand error response");
+        labelMap.put(KeyEnum.command_rejected_message, "Command error response");
 
         botMap.put(KeyEnum.join_command, "!join");
         labelMap.put(KeyEnum.join_command, "Text representing the 'join' command");
