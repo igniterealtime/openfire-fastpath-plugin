@@ -459,11 +459,15 @@ public class Chatbot implements UserCommunicationMethod {
                     AgentSession agentSession = AGENT_MANAGER.getAgentSession(from);
 
                     if (agentSession != null) {
-                        if (accept) offer.accept(agentSession);
-                        if (!accept) offer.reject(agentSession);
+                        if (accept) {
+                            offer.accept(agentSession);
+                            sendReply(message, getCommandAcceptedMessage());
+                        }
+                        if (!accept) {
+                            offer.reject(agentSession);
+                            sendReply(message, getCommandRejectedMessage());
+                        }
                         handled = true;
-
-                        sendReply(message, getCommandAcceptedMessage());
                     }
                 }
             } catch (Exception e) {
