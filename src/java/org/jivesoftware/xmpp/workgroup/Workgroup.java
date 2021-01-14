@@ -22,6 +22,7 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -131,8 +132,8 @@ public class Workgroup {
     private String description = null;
     private Date creationDate;
     private Date modDate;
-    private long offerTimeout = -1;
-    private long requestTimeout = -1;
+    private Duration offerTimeout = Duration.ofMillis(-1);
+    private Duration requestTimeout = Duration.ofMillis(-1);
     private int maxChats;
     private int minChats;
 
@@ -301,7 +302,7 @@ public class Workgroup {
         boolean queueCreated = createQueue(queueID, name);
         if (queueCreated) {
             BasicDispatcherInfo info = new BasicDispatcherInfo(this, queueID,
-                "Round Robin Dispatcher", "None", -1, -1);
+                "Round Robin Dispatcher", "None", Duration.ofMillis(-1), Duration.ofMillis(-1));
             try {
                 dispatcherInfoProvider.insertDispatcherInfo(queueID, info);
                 queue = new RequestQueue(this, queueID);
@@ -1198,7 +1199,7 @@ public class Workgroup {
         updateWorkgroup();
     }
 
-    public void setRequestTimeout(long timeout) {
+    public void setRequestTimeout(Duration timeout) {
         if (timeout == requestTimeout) {
             // Do nothing
             return;
@@ -1207,14 +1208,14 @@ public class Workgroup {
         updateWorkgroup();
     }
 
-    public long getRequestTimeout() {
+    public Duration getRequestTimeout() {
         if (isDefaultRequestTimeout()) {
             return WorkgroupManager.getInstance().getDefaultRequestTimeout();
         }
         return requestTimeout;
     }
 
-    public void setOfferTimeout(long timeout) {
+    public void setOfferTimeout(Duration timeout) {
         if (timeout == offerTimeout) {
             // Do nothing
             return;
@@ -1223,7 +1224,7 @@ public class Workgroup {
         updateWorkgroup();
     }
 
-    public long getOfferTimeout() {
+    public Duration getOfferTimeout() {
         if (isDefaultOfferTimeout()) {
             return WorkgroupManager.getInstance().getDefaultOfferTimeout();
         }
@@ -1239,11 +1240,11 @@ public class Workgroup {
     }
 
     public boolean isDefaultRequestTimeout() {
-        return requestTimeout == -1;
+        return requestTimeout.isNegative();
     }
 
     public boolean isDefaultOfferTimeout() {
-        return offerTimeout == -1;
+        return offerTimeout.isNegative();
     }
 
     public DbProperties getProperties() {
@@ -1287,8 +1288,8 @@ public class Workgroup {
                 modDate = new Date(Long.parseLong(rs.getString(7).trim()));
                 maxChats = rs.getInt(8);
                 minChats = rs.getInt(9);
-                offerTimeout = rs.getInt(10);
-                requestTimeout = rs.getInt(11);
+                offerTimeout = Duration.ofMillis(rs.getInt(10));
+                requestTimeout = Duration.ofMillis(rs.getInt(11));
                 schedule = new Schedule(id, rs.getString(12));
             }
         }
@@ -1385,8 +1386,8 @@ public class Workgroup {
             pstmt.setString(6, StringUtils.dateToMillis(modDate));
             pstmt.setInt(7, maxChats);
             pstmt.setInt(8, minChats);
-            pstmt.setLong(9, offerTimeout);
-            pstmt.setLong(10, requestTimeout);
+            pstmt.setLong(9, offerTimeout.toMillis());
+            pstmt.setLong(10, requestTimeout.toMillis());
             pstmt.setString(11, schedule.toString());
             pstmt.setLong(12, id);
             pstmt.executeUpdate();

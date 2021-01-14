@@ -16,6 +16,7 @@
 
 package org.jivesoftware.xmpp.workgroup.request;
 
+import java.time.Instant;
 import java.util.Arrays;
 
 import org.dom4j.DocumentHelper;
@@ -171,7 +172,7 @@ public class InvitationRequest extends Request {
     }
 
     @Override
-    public void updateSession(int state, long offerTime) {
+    public void updateSession(int state, Instant offerTime) {
         // Ignore
     }
 

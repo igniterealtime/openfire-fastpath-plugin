@@ -5,6 +5,7 @@
                  org.jivesoftware.util.ParamUtils,
                  org.jivesoftware.util.JiveGlobals"
 %><%@ page import="org.jivesoftware.openfire.XMPPServer"%><%@ page import="org.jivesoftware.openfire.muc.MultiUserChatService"%>
+<%@ page import="java.time.Duration" %>
 
 <html>
     <head>
@@ -67,8 +68,8 @@
         if (errors.size() == 0) {
             wgManager.setDefaultMaxChats(maxChats);
             wgManager.setDefaultMinChats(minChats);
-            wgManager.setDefaultRequestTimeout(requestTimeout * 1000);
-            wgManager.setDefaultOfferTimeout(offerTimeout * 1000);
+            wgManager.setDefaultRequestTimeout(Duration.ofSeconds(requestTimeout));
+            wgManager.setDefaultOfferTimeout(Duration.ofSeconds(offerTimeout));
             JiveGlobals.setProperty("xmpp.live.rejection.timeout", Integer.toString(rejectionTimeout * 1000));
             JiveGlobals.setProperty("xmpp.live.request.overflow", Integer.toString(maxOverflows));
             JiveGlobals.setProperty("xmpp.live.agent.change-properties", canChangeName ? "true" : "false");
@@ -81,8 +82,8 @@
     if (errors.size() == 0) {
         maxChats = wgManager.getDefaultMaxChats();
         minChats = wgManager.getDefaultMinChats();
-        requestTimeout = wgManager.getDefaultRequestTimeout() / 1000;
-        offerTimeout = wgManager.getDefaultOfferTimeout() / 1000;
+        requestTimeout = wgManager.getDefaultRequestTimeout().getSeconds();
+        offerTimeout = wgManager.getDefaultOfferTimeout().getSeconds();
         rejectionTimeout = JiveGlobals.getIntProperty("xmpp.live.rejection.timeout", 20000) / 1000;
         maxOverflows = JiveGlobals.getIntProperty("xmpp.live.request.overflow", 3);
         canChangeName = JiveGlobals.getBooleanProperty("xmpp.live.agent.change-properties", true);

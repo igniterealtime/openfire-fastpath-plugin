@@ -45,8 +45,8 @@
     //AgentSelector newSelector = null;
 
     DispatcherInfo infos = queue.getDispatcher().getDispatcherInfo();
-    long requestTimeout = infos.getRequestTimeout() / 1000;
-    long offerTimeout = infos.getOfferTimeout() / 1000;
+    long requestTimeout = infos.getRequestTimeout().getSeconds();
+    long offerTimeout = infos.getOfferTimeout().getSeconds();
 
     String successMessage = null;
 %>

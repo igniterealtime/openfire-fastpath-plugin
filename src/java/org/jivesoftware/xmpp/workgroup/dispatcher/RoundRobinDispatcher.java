@@ -74,10 +74,9 @@ public class RoundRobinDispatcher extends AbstractDispatcher {
                     // Recheck for changed maxchat setting
                     Workgroup workgroup = request.getWorkgroup();
                     if (session.getCurrentChats(workgroup) < session.getMaxChats(workgroup)) {
-                        // Set the timeout of the offer based on the remaining time of the
-                        // initial request and the default offer timeout
-                        timeRemaining = Duration.between(Instant.now(), timeout);
-                        offer.setTimeout(Math.min(timeRemaining.toMillis(), info.getOfferTimeout()));
+                        // Set the timeout of the offer based on the remaining time of the initial request and the default offer timeout
+                        final Duration remaining = Duration.between(Instant.now(), timeout);
+                        offer.setTimeout(remaining.compareTo(info.getOfferTimeout()) < 0 ? remaining : info.getOfferTimeout());
 
                         // Make the offer and wait for a resolution to the offer
                         if (!request.sendOffer(session, queue)) {

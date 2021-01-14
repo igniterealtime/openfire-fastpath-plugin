@@ -55,7 +55,8 @@ public class OpportunisticDispatcher extends AbstractDispatcher
         }
 
         // Set the timeout of the offer based on the remaining time of the initial request and the default offer timeout
-        offer.setTimeout(Math.min(Duration.between(timeout, Instant.now()).toMillis(), info.getOfferTimeout()));
+        final Duration remaining = Duration.between(Instant.now(), timeout);
+        offer.setTimeout(remaining.compareTo(info.getOfferTimeout()) < 0 ? remaining : info.getOfferTimeout());
 
         // Try to send the offer to all agents.
         final Set<AgentSession> offeredAgents = new HashSet<>();

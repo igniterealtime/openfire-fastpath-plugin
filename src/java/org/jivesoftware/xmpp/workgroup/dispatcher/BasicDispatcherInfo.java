@@ -19,6 +19,8 @@ package org.jivesoftware.xmpp.workgroup.dispatcher;
 import org.jivesoftware.xmpp.workgroup.UnauthorizedException;
 import org.jivesoftware.xmpp.workgroup.Workgroup;
 
+import java.time.Duration;
+
 /**
  * <p>A basic, 'pure data structure' implementation of the dispatcher info interface.
  *
@@ -30,16 +32,16 @@ public class BasicDispatcherInfo implements DispatcherInfo {
     private String name;
     private String description;
     private Workgroup workgroup;
-    private long offerTimeout = -1;
-    private long requestTimeout = -1;
+    private Duration offerTimeout;
+    private Duration requestTimeout;
 
     public BasicDispatcherInfo(
             Workgroup workgroup,
             long id,
             String name,
             String description,
-            long offerTimeout,
-            long requestTimeout) {
+            Duration offerTimeout,
+            Duration requestTimeout) {
         this.workgroup = workgroup;
         this.id = id;
         this.name = name;
@@ -69,23 +71,23 @@ public class BasicDispatcherInfo implements DispatcherInfo {
         this.description = description;
     }
 
-    public void setRequestTimeout(long timeout) {
+    public void setRequestTimeout(Duration timeout) {
         requestTimeout = timeout;
     }
 
-    public long getRequestTimeout() {
-        if (requestTimeout == -1) {
+    public Duration getRequestTimeout() {
+        if (requestTimeout.isNegative()) {
             return workgroup.getRequestTimeout();
         }
         return requestTimeout;
     }
 
-    public void setOfferTimeout(long timeout) {
+    public void setOfferTimeout(Duration timeout) {
         offerTimeout = timeout;
     }
 
-    public long getOfferTimeout() {
-        if (offerTimeout == -1) {
+    public Duration getOfferTimeout() {
+        if (offerTimeout.isNegative()) {
             return workgroup.getOfferTimeout();
         }
         return offerTimeout;

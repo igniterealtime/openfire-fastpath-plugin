@@ -17,7 +17,11 @@
 package org.jivesoftware.xmpp.workgroup;
 
 import org.jivesoftware.xmpp.workgroup.request.Request;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -29,6 +33,9 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * @author Derek DeMoro
  */
 public class Offer {
+
+    private static final Logger Log = LoggerFactory.getLogger(Offer.class);
+
     /**
      * User associated with this Offer
      */
@@ -50,11 +57,11 @@ public class Offer {
     /**
      * The (server) time the Offer was made to the agent, initialized in constructor.
      */
-    private Date offerTime;
+    private Instant offerTime;
     /**
-     * The timeout of the Offer in milliseconds or -1 for no timeout.
+     * The timeout of the Offer. Anything negative for no timeout.
      */
-    private long timeout = 20000;
+    private Duration timeout = Duration.ofMillis(20000);
     /**
      * The set of agents that have rejected this Offer.
      */
@@ -68,20 +75,20 @@ public class Offer {
      * The motivation is to ensure offers don't stay idle in the queue
      * waiting for an agent to change their status to get another offer.</p>
      * <p/>
-     * <p>The proper behavior shoud be to have the agent app notifyEvent the server
+     * <p>The proper behavior should be to have the agent app notifyEvent the server
      * when the agent is ready to accept new offers (or be re-offered old ones)
      * at user defined times. Manually is probably preferred (press button on
      * app to indicate "ready for next". Or could be automatic via a timer.
      * In either case driving this from the server is a poor solution
      * and should be fixed ASAP.</p>
      */
-    private Map<String, Date> rejectionTimes = new HashMap<String, Date>();
+    private Map<String, Instant> rejectionTimes = new HashMap<>();
 
     /**
      * The length in milliseconds before automatically removing an agent
      * from the rejector list.
      */
-    private long rejectionTimeout;
+    private Duration rejectionTimeout;
 
     /**
      * Flag indicating the offer has been cancelled or not.
@@ -109,11 +116,11 @@ public class Offer {
      * @param queue   The request queue that is sending this offer to the agents.
      * @param rejectionTimeout the number of milliseconds to wait until expiring an agent rejection.
      */
-    public Offer(Request request, RequestQueue queue, long rejectionTimeout) {
+    public Offer(Request request, RequestQueue queue, Duration rejectionTimeout) {
         this.request = request;
         this.queue = queue;
         this.rejectionTimeout = rejectionTimeout;
-        offerTime = new Date();
+        offerTime = Instant.now();
         cancelled = false;
         invitationSent = false;
         request.setOffer(this);
@@ -146,7 +153,7 @@ public class Offer {
 
     private void addRejector(AgentSession agentSession) {
         rejections.add(agentSession.getJID().toBareJID());
-        rejectionTimes.put(agentSession.getJID().toBareJID(), new Date());
+        rejectionTimes.put(agentSession.getJID().toBareJID(), Instant.now());
     }
 
     public void removeRejector(AgentSession agentSession) {
@@ -155,10 +162,10 @@ public class Offer {
     }
 
     public boolean isRejector(AgentSession agentSession) {
-        Date rejectionTime = rejectionTimes.get(agentSession.getJID().toBareJID());
+        Instant rejectionTime = rejectionTimes.get(agentSession.getJID().toBareJID());
         boolean rejector = false;
         if (rejectionTime != null) {
-            if (rejectionTime.getTime() > System.currentTimeMillis() - rejectionTimeout) {
+            if (rejectionTime.isAfter(Instant.now().minus(rejectionTimeout))) {
                 rejector = true;
             }
             else {
@@ -176,15 +183,15 @@ public class Offer {
         return rejections;
     }
 
-    public Date getOfferTime() {
+    public Instant getOfferTime() {
         return offerTime;
     }
 
-    public long getTimeout() {
+    public Duration getTimeout() {
         return timeout;
     }
 
-    public void setTimeout(long timeout) {
+    public void setTimeout(Duration timeout) {
         this.timeout = timeout;
     }
 
@@ -200,8 +207,9 @@ public class Offer {
     }
 
     public void waitForResolution() {
-        long timeoutTime = offerTime.getTime() + timeout;
-        while (timeoutTime > System.currentTimeMillis() && !isAccepted() && !pendingSessions.isEmpty()) {
+        Instant timeoutTime = offerTime.plus(timeout);
+        Log.debug("Waiting for resolution. Original offer time: {}, timeout: {}, timeoutTime: {}", new Object[] {offerTime, timeout, timeoutTime} );
+        while (timeoutTime.isAfter(Instant.now()) && !isAccepted() && !pendingSessions.isEmpty()) {
             try {
                 Thread.sleep(500); // half second polling
             }
@@ -210,18 +218,19 @@ public class Offer {
             }
         }
 
-        // Accepted or not: send a revocation to all pending sessions.
+        Log.debug("Accepted or not: send a revocation to all pending sessions.");
         try {
             for (AgentSession session : pendingSessions) {
                 request.sendRevoke(session, queue);
 
                 if (!isAccepted()) {
+                    Log.debug("Not accepted. Rejecting...");
                     reject(session);
                 }
             }
         }
         catch (Exception e) {
-            // Ignore
+            Log.warn("An unexpected exception occurred while processing offer resolution.", e);
         }
     }
 
@@ -248,7 +257,7 @@ public class Offer {
     public void addPendingSession(AgentSession agentSession) {
         pendingSessions.add(agentSession);
         // reset the Offer time
-        offerTime = new Date();
+        offerTime = Instant.now();
     }
 
     /**
@@ -283,6 +292,6 @@ public class Offer {
      */
     private void updateUserSession(int state) {
         // Update the current session.
-        request.updateSession(state, offerTime.getTime());
+        request.updateSession(state, offerTime);
     }
 }

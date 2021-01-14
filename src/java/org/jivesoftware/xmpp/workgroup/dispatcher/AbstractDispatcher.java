@@ -167,7 +167,7 @@ public abstract class AbstractDispatcher implements Dispatcher, AgentSessionList
         // to overflow the current request
         if (!agentList.isEmpty()) {
             // The time when the request should timeout.
-            final Instant timeout = Instant.now().plus(Duration.ofMillis(info.getRequestTimeout()));
+            final Instant timeout = Instant.now().plus(info.getRequestTimeout());
 
             final Map<String, List<String>> map = request.getMetaData();
             final String initialAgentName = map.get("agent") == null || map.get("agent").isEmpty() ? null : map.get("agent").get(0);
@@ -182,7 +182,7 @@ public abstract class AbstractDispatcher implements Dispatcher, AgentSessionList
 
         if (!offer.isAccepted() && !offer.isCancelled()) {
             // Calculate the maximum time limit for an unattended request before cancelling it
-            final Instant limit = request.getCreationTime().toInstant().plus( Duration.ofMillis( info.getRequestTimeout() * (getOverflowTimes() + 1) ) );
+            final Instant limit = request.getCreationTime().plus( info.getRequestTimeout().multipliedBy(getOverflowTimes() + 1) );
             if (!Instant.now().isAfter(limit) || !canBeInQueue) {
                 Log.debug("Cancelling request that maxed out overflow limit or cannot be queued: {}", request);
                 // Cancel the request if it has overflowed 'n' times
@@ -323,8 +323,8 @@ public abstract class AbstractDispatcher implements Dispatcher, AgentSessionList
      *
      * @return the number of milliseconds to wait until expiring an agent rejection.
      */
-    public long getAgentRejectionTimeout() {
-        return JiveGlobals.getIntProperty("xmpp.live.rejection.timeout", 20000);
+    public Duration getAgentRejectionTimeout() {
+        return Duration.ofMillis(JiveGlobals.getIntProperty("xmpp.live.rejection.timeout", 20000));
     }
 
     @Override

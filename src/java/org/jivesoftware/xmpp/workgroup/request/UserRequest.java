@@ -19,6 +19,8 @@ package org.jivesoftware.xmpp.workgroup.request;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Iterator;
@@ -261,14 +263,14 @@ public class UserRequest extends Request {
         return pos;
     }
 
-    public int getTimeStatus() {
-        int averageTime = queue == null ? 0 : queue.getAverageTime();
-        int timeStatus;
-        if (averageTime == 0) {
-            timeStatus = (getPosition() + 1) * 15;
+    public Duration getTimeStatus() {
+        Duration averageTime = queue == null ? Duration.ZERO : queue.getAverageTime();
+        Duration timeStatus;
+        if (averageTime.isZero()) {
+            timeStatus = Duration.ofSeconds(15).multipliedBy(getPosition() + 1);
         }
         else {
-            timeStatus = (getPosition() + 1) * averageTime;
+            timeStatus = averageTime.multipliedBy(getPosition() + 1);
         }
         return timeStatus;
     }
@@ -441,9 +443,9 @@ public class UserRequest extends Request {
     }
 
     @Override
-    public void updateSession(int state, long offerTime) {
+    public void updateSession(int state, Instant offerTime) {
         boolean inserted = false;
-        long queueWaitTime = new Date().getTime() - offerTime;
+        Duration queueWaitTime = Duration.between(offerTime, Instant.now());
         String tempDate = StringUtils.dateToMillis(new Date());
 
         // Gather all information needed.
@@ -458,7 +460,7 @@ public class UserRequest extends Request {
                     pstmt.setString(2, getUserID());
                     pstmt.setLong(3, getWorkgroup().getID());
                     pstmt.setInt(4, state);
-                    pstmt.setLong(5, queueWaitTime);
+                    pstmt.setLong(5, queueWaitTime.toMillis());
                     pstmt.setString(6, tempDate);
                     pstmt.setString(7, tempDate);
                     pstmt.executeUpdate();
@@ -468,7 +470,7 @@ public class UserRequest extends Request {
                 else {
                     pstmt = con.prepareStatement(UPDATE_SESSION);
                     pstmt.setInt(1, state);
-                    pstmt.setLong(2, queueWaitTime);
+                    pstmt.setLong(2, queueWaitTime.toMillis());
                     pstmt.setString(3, tempDate);
                     pstmt.setString(4, requestID);
                     pstmt.executeUpdate();

@@ -19,6 +19,7 @@ package org.jivesoftware.openfire.fastpath.util;
 import gnu.inet.encoding.Stringprep;
 import gnu.inet.encoding.StringprepException;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -60,7 +61,7 @@ public class WorkgroupUtils {
     private static final Logger Log = LoggerFactory.getLogger(WorkgroupUtils.class);
     
     public static String updateWorkgroup(String workgroupName, String displayName,
-            String description, int maxSize, int minSize, long requestTimeout, long offerTimeout) 
+            String description, int maxSize, int minSize, Duration requestTimeout, Duration offerTimeout)
     {
         final WorkgroupManager workgroupManager = WorkgroupManager.getInstance();
         Workgroup workgroup;
