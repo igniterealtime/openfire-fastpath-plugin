@@ -7,8 +7,7 @@
                  org.xmpp.packet.JID,
                  org.jivesoftware.openfire.fastpath.settings.offline.OfflineSettingsManager,
                  org.jivesoftware.openfire.fastpath.settings.offline.OfflineSettings,
-                 org.jivesoftware.openfire.fastpath.settings.offline.OfflineSettingsNotFound,
-                 org.jivesoftware.openfire.fastpath.util.WorkgroupUtils"
+                 org.jivesoftware.openfire.fastpath.settings.offline.OfflineSettingsNotFound"
 %><%@ page import="org.jivesoftware.util.JiveGlobals" %>
  <%
      String wgID = request.getParameter("wgID");
@@ -17,6 +16,13 @@
 
      OfflineSettingsManager offlineManager = new OfflineSettingsManager();
      String redirectValue = request.getParameter("redirectToPage");
+     String muc = request.getParameter("redirectToMUC");
+     JID redirectMUC;
+     if (muc != null && !muc.isEmpty()) {
+         redirectMUC = new JID(muc);
+     } else {
+         redirectMUC = null;
+     }
      String statusMessage = "";
 
      OfflineSettings offlineSettings = null;
@@ -35,14 +41,14 @@
          String emailAddress = request.getParameter("email");
          String subject = request.getParameter("subject");
          String header = request.getParameter("headerField");
-         offlineSettings = offlineManager.saveOfflineSettings(workgroup, redirectValue, emailAddress, subject, header);
+         offlineSettings = offlineManager.saveOfflineSettings(workgroup, redirectValue, emailAddress, subject, header, redirectMUC);
          if (offlineSettings != null) {
              statusMessage = "Offline settings have been saved.";
          }
      }
      else if(delete){
         statusMessage = "Offline settings have been deleted.";
-        offlineSettings = offlineManager.saveOfflineSettings(workgroup, redirectValue, "", "", "");
+        offlineSettings = offlineManager.saveOfflineSettings(workgroup, redirectValue, "", "", "", null);
      }
      else {
          try {
@@ -74,14 +80,29 @@
                  document.offline.email.value = "";
                  document.offline.subject.value = "";
                  document.offline.headerField.value = "";
+                 document.offline.redirectToMUC.value = "";
 
                  document.offline.submit();
              }
-             else if(todo[1].checked){
+             else if(todo[1].checked) {
+                 var muc = document.offline.redirectToMUC.value;
+                 if(!Jtrim(muc)){
+                     alert("Please specify the MUC to forward to.");
+                     document.offline.redirectToMUC.focus();
+                     return;
+                 }
+                 document.offline.email.value = "";
+                 document.offline.subject.value = "";
+                 document.offline.headerField.value = "";
+
+                 document.offline.submit();
+             }
+             else if(todo[2].checked){
                var email = document.offline.email.value;
                var subject = document.offline.subject.value;
                var message = document.offline.headerField.value;
                document.offline.redirectToPage.value = '';
+               document.offline.redirectToMUC.value = '';
 
                if(!Jtrim(email) || !Jtrim(subject) || !Jtrim(message)){
                  alert("All fields are required.");
@@ -130,7 +151,7 @@
         </div>
         <table width="100%" cellpadding="3" cellspacing="0" border="0" class="jive-contentBox">
                 <tr valign="top">
-                <% String checked = offlineSettings.redirects() ? "checked" : ""; %>
+                <% String checked = offlineSettings.redirectsWeb() ? "checked" : ""; %>
                             <td width="1%">
                                 <input type="radio" name="todo" value="redirectToPage" <%= checked %> />
                             </td>
@@ -141,9 +162,21 @@
                                  <span class="jive-description">e.g. http://www.jivesoftware.com/contact.html</span>
                             </td>
                 </tr>
+                <tr valign="top">
+                    <% checked = offlineSettings.redirectsMUC() ? "checked" : ""; %>
+                    <td width="1%">
+                        <input type="radio" name="todo" value="redirectToMUC" <%= checked %> />
+                    </td>
+                    <td nowrap><b>Redirect To Chat Room</b>
+                    </td>
+                    <td class="c2">
+                        <input type="text" name="redirectToMUC" size="40" value="<%= offlineSettings.getRedirectMUC() == null ? "" : offlineSettings.getRedirectMUC() %>" /><br/>
+                        <span class="jive-description">e.g. support@conference.example.org</span>
+                    </td>
+                </tr>
                 <tr>
                     <td nowrap width="1%">
-                         <input type="radio" name="todo" value="showEmailPage" <%=!offlineSettings.redirects() ? "checked" :"" %>/>
+                         <input type="radio" name="todo" value="showEmailPage" <%=!offlineSettings.redirectsWeb() && !offlineSettings.redirectsMUC() ? "checked" :"" %>/>
                          <td><b>Display Email Form</b></td>
                      </td>
                      <td>&nbsp;</td>

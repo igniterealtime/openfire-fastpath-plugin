@@ -17,6 +17,7 @@
 package org.jivesoftware.openfire.fastpath.settings.offline;
 
 import org.jivesoftware.xmpp.workgroup.utils.ModelUtil;
+import org.xmpp.packet.JID;
 
 public class OfflineSettings {
     private String redirectURL;
@@ -24,6 +25,8 @@ public class OfflineSettings {
     private String offlineText;
     private String emailAddress;
     private String subject;
+
+    private JID redirectMUC;
 
     public String getRedirectURL() {
         if(!ModelUtil.hasLength(redirectURL)){
@@ -69,7 +72,19 @@ public class OfflineSettings {
         this.subject = subject;
     }
 
-    public boolean redirects(){
+    public JID getRedirectMUC() {
+        return redirectMUC;
+    }
+
+    public void setRedirectMUC(JID redirectMUC) {
+        this.redirectMUC = redirectMUC;
+    }
+
+    public boolean redirectsWeb(){
         return (ModelUtil.hasLength(getRedirectURL()));
+    }
+
+    public boolean redirectsMUC(){
+        return redirectMUC != null;
     }
 }

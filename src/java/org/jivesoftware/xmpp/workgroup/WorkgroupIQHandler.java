@@ -81,6 +81,7 @@ public class WorkgroupIQHandler {
 
     public void process(IQ packet) {
         try {
+            Log.trace("Processing IQ: {}", packet.toXML());
             IQ.Type type = packet.getType();
             if (type == IQ.Type.set) {
                 handleIQSet(packet);
@@ -508,7 +509,7 @@ public class WorkgroupIQHandler {
             getVCard(packet);
         }
         else {
-
+            Log.trace("providers");
             // Check all Workgroup Providers for handling this GET request. If
             // none are found, send bad request error.
             for (WorkgroupProvider provider : providerManager.getWorkgroupProviders()) {

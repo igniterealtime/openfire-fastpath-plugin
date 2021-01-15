@@ -54,6 +54,9 @@ public class OfflineSettingsProvider implements WorkgroupProvider {
         if (ModelUtil.hasLength(settings.getRedirectURL())) {
             offline.addElement("redirectPage").setText(settings.getRedirectURL());
         }
+        else if (settings.getRedirectMUC() != null) {
+            offline.addElement("redirectMUC").setText(settings.getRedirectMUC().toString());
+        }
         else {
             offline.addElement("emailAddress").setText(settings.getEmailAddress());
             offline.addElement("offlineText").setText(settings.getOfflineText());
