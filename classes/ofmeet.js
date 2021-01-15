@@ -139,6 +139,21 @@ var ofmeet = (function(of)
             console.error('join workgroup error', err);
             document.getElementById("chatloader").style.visibility = "hidden";
         });
+
+        _converse.connection.addHandler(function(message) {
+            if (message.querySelector('depart-queue')) {
+                console.info("joining workgroup failed - departed the queue")
+                document.getElementById("chatloader").style.visibility = "hidden";
+                document.getElementById("chatbutton").style.visibility = "visible";
+                // TODO: give some kind of feedback to the end-user, explaining why this has happened.
+
+                // Got a 'depart-queue' message: remove this handler by returning 'false'.
+                return false; // TODO this handler should also be removed after successfully joining a room.
+            } else {
+                // Did not get a 'depart-queue' message: retain this handler by returning 'true'.
+                return true
+            }
+        }, 'http://jabber.org/protocol/workgroup','message');
     }
 
     function getFastPathStatus(callback)
