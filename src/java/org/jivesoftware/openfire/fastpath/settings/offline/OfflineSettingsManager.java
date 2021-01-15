@@ -24,6 +24,7 @@ import org.jivesoftware.database.DbConnectionManager;
 import org.jivesoftware.xmpp.workgroup.Workgroup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xmpp.packet.JID;
 
 /**
  * Retrieves and persists offline settings for a workgroup.
@@ -35,22 +36,22 @@ public class OfflineSettingsManager {
     private static final Logger Log = LoggerFactory.getLogger(OfflineSettingsManager.class);
     
     private static final String GET_OFFLINE_SETTTINGS =
-            "SELECT redirectPage, emailAddress, subject, offlineText FROM " +
+            "SELECT redirectPage, emailAddress, subject, offlineText, redirectMUC FROM " +
             "fpOfflineSetting WHERE workgroupID=?";
     private static final String INSERT_OFFLINE_SETTINGS =
             "INSERT INTO fpOfflineSetting(workgroupID, redirectPage, emailAddress, subject, " +
-            "offlineText) VALUES(?,?,?,?,?)";
+            "offlineText, redirectMUC) VALUES(?,?,?,?,?,?)";
     private static final String UPDATE_OFFLINE_SETTINGS =
-            "UPDATE fpOfflineSetting SET redirectPage=?, emailAddress=?, subject=?, offlineText=? " +
+            "UPDATE fpOfflineSetting SET redirectPage=?, emailAddress=?, subject=?, offlineText=?, redirectMUC=?" +
             "WHERE workgroupID=?";
 
     public OfflineSettings saveOfflineSettings(Workgroup workgroup, String webPage, String email,
-            String subject, String offlineText)
+            String subject, String offlineText, JID redirectMUC)
     {
         OfflineSettings offline;
         try {
             offline = getOfflineSettings(workgroup);
-            return updateOfflineSettings(workgroup, webPage, email, subject, offlineText);
+            return updateOfflineSettings(workgroup, webPage, email, subject, offlineText, redirectMUC);
         }
         catch (OfflineSettingsNotFound osnf) {
             offline = new OfflineSettings();
@@ -60,6 +61,7 @@ public class OfflineSettingsManager {
         offline.setEmailAddress(email);
         offline.setOfflineText(offlineText);
         offline.setSubject(subject);
+        offline.setRedirectMUC(redirectMUC);
 
         String redirectURL = webPage != null ? webPage : "";
         String emailAddress = email != null ? email : "";
@@ -78,6 +80,7 @@ public class OfflineSettingsManager {
             pstmt.setString(4, subject);
 
             DbConnectionManager.setLargeTextField(pstmt, 5, offlineText);
+            pstmt.setString(6, redirectMUC == null ? null : redirectMUC.toString());
             pstmt.executeUpdate();
         }
         catch (Exception ex) {
@@ -91,14 +94,14 @@ public class OfflineSettingsManager {
     }
 
     public OfflineSettings updateOfflineSettings(Workgroup workgroup, String webPage,
-            String email, String subject, String offlineText)
+            String email, String subject, String offlineText, JID redirectMUC)
     {
         final OfflineSettings offline = new OfflineSettings();
         offline.setRedirectURL(webPage);
         offline.setEmailAddress(email);
         offline.setOfflineText(offlineText);
         offline.setSubject(subject);
-
+        offline.setRedirectMUC(redirectMUC);
 
         String redirectURL = webPage != null ? webPage : "";
         String emailAddress = email != null ? email : "";
@@ -115,7 +118,8 @@ public class OfflineSettingsManager {
             pstmt.setString(3, subject);
 
             DbConnectionManager.setLargeTextField(pstmt, 4, offlineText);
-            pstmt.setLong(5, workgroup.getID());
+            pstmt.setString(5, redirectMUC == null ? null : redirectMUC.toString());
+            pstmt.setLong(6, workgroup.getID());
             pstmt.executeUpdate();
         }
         catch (Exception ex) {
@@ -138,7 +142,7 @@ public class OfflineSettingsManager {
      */
     public OfflineSettings getOfflineSettings(Workgroup workgroup) throws OfflineSettingsNotFound {
         OfflineSettings offlineSettings = null;
-
+        Log.trace("Get offline settings for workgroup {}", workgroup.getDisplayName());
         Connection con = null;
         PreparedStatement pstmt = null;
         ResultSet rs = null;
@@ -152,12 +156,20 @@ public class OfflineSettingsManager {
                 String emailAddress = rs.getString(2);
                 String subject = rs.getString(3);
                 String offlineText = DbConnectionManager.getLargeTextField(rs, 4);
+                String muc = rs.getString(5);
+                JID redirectMUC;
+                if (muc == null || muc.isEmpty()) {
+                    redirectMUC = null;
+                } else {
+                    redirectMUC = new JID(muc);
+                }
 
                 offlineSettings = new OfflineSettings();
                 offlineSettings.setRedirectURL(redirectPage);
                 offlineSettings.setEmailAddress(emailAddress);
                 offlineSettings.setSubject(subject);
                 offlineSettings.setOfflineText(offlineText);
+                offlineSettings.setRedirectMUC(redirectMUC);
             }
         }
         catch (Exception ex) {

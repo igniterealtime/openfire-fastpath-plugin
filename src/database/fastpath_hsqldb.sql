@@ -175,6 +175,7 @@ CREATE TABLE fpOfflineSetting (
   emailAddress varChar(255),
   subject varChar(255),
   offlineText LONGVARCHAR,
+  redirectMUC varChar(255),
   PRIMARY KEY(workgroupID)
 );
 

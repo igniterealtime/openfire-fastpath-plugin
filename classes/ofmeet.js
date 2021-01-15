@@ -22,7 +22,6 @@ var ofmeet = (function(of)
     if (!conversation) conversation = "false";
 
     const fastpath = workgroup + '@workgroup.' + domain;
-    const roomJid = workgroup + '@conference.' + domain;
     const boshUri = 'https://' + server + '/http-bind/';
     const wsUri = 'wss://' + server + '/ws/';
 
@@ -111,7 +110,7 @@ var ofmeet = (function(of)
 
             }
             else {
-                _converse.api.rooms.open(roomJid, {nick: getNick()});
+                performOfflineAction();
             }
         });
     }
@@ -143,9 +142,7 @@ var ofmeet = (function(of)
         _converse.connection.addHandler(function(message) {
             if (message.querySelector('depart-queue')) {
                 console.info("joining workgroup failed - departed the queue")
-                document.getElementById("chatloader").style.visibility = "hidden";
-                document.getElementById("chatbutton").style.visibility = "visible";
-                // TODO: give some kind of feedback to the end-user, explaining why this has happened.
+                performOfflineAction();
 
                 // Got a 'depart-queue' message: remove this handler by returning 'false'.
                 return false; // TODO this handler should also be removed after successfully joining a room.
@@ -179,6 +176,52 @@ var ofmeet = (function(of)
         }, function(err) {
             console.error("fastpath error", err);
             callback(false);
+        });
+    }
+
+    function performOfflineAction(callback) {
+        // Obtain the offline settings options.
+        const iq = converse.env.$iq({type: 'get', to: fastpath}).c('offline-settings', {xmlns: 'http://jivesoftware.com/protocol/workgroup'});
+
+        _converse.connection.sendIQ(iq, function(resp)
+        {
+            console.debug("Received Offline Settings", resp);
+
+            if (resp.querySelector('redirectPage')) {
+                const redirectPage = resp.querySelector('redirectPage').innerHTML;
+                console.debug("Offline Settings suggest to redirect to webpage:", redirectPage);
+                // TODO show dialog, suggest to redirect to webpage.
+                document.getElementById("chatloader").style.visibility = "hidden";
+                document.getElementById("chatbutton").style.visibility = "visible";
+            } else if (resp.querySelector('emailAddress')) {
+                console.debug("Offline Settings suggest to ask the user to leave a message.");
+                const emailAddress = resp.querySelector('emailAddress').innerHTML;
+                const offlineText = resp.querySelector('offlineText').innerHTML;
+                const subject = resp.querySelector('subject').innerHTML;
+                // TODO show form, invite to leave a message, send data back to server (using iq 'send-email' 'http://jivesoftware.com/protocol/workgroup')
+                document.getElementById("chatloader").style.visibility = "hidden";
+                document.getElementById("chatbutton").style.visibility = "visible";
+            } else if (resp.querySelector('redirectMUC')) {
+                const redirectMUC = resp.querySelector('redirectMUC').innerHTML;
+                console.debug("Offline Settings suggest to redirect to MUC:", redirectMUC);
+                document.getElementById("chatloader").style.visibility = "hidden";
+                // TODO show dialog, suggest to redirect to MUC, open after confirmation.
+                _converse.api.rooms.open(redirectMUC, {nick: getNick()});
+            } else {
+                // TODO show apology
+
+                // Remove the spinner, restore the 'chat' button.
+                document.getElementById("chatloader").style.visibility = "hidden";
+                document.getElementById("chatbutton").style.visibility = "visible";
+            }
+
+        }, function(err) {
+            // Service will return a 404 if there are no offline settings for a workgroup (which is the default).
+            console.info("Offline settings not available.");
+
+            // Remove the spinner, restore the 'chat' button.
+            document.getElementById("chatloader").style.visibility = "hidden";
+            document.getElementById("chatbutton").style.visibility = "visible";
         });
     }
 
