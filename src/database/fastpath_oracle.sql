@@ -14,14 +14,14 @@ CREATE TABLE fpWorkgroup(
   minchats            INT NOT NULL,
   requestTimeout      INT NOT NULL,
   offerTimeout        INT NOT NULL,
-  schedule            VARCHAR(3900) NULL
+  schedule            NCLOB NULL
 );
 CREATE INDEX fpWorkgroup_workgroupid_idx on fpWorkgroup(workgroupID);
 
 CREATE TABLE fpWorkgroupProp (
   ownerID       INT NOT NULL,
   name          VARCHAR(100) NOT NULL,
-  propValue     LONG,
+  propValue     NCLOB NOT NULL,
   CONSTRAINT fpWorkgroupProp_pk PRIMARY KEY (ownerID,name)
 );
 
@@ -38,7 +38,7 @@ CREATE INDEX fpagent_agentjid_idx ON fpAgent(agentJID);
 CREATE TABLE fpAgentProp (
   ownerID       INT NOT NULL,
   name          VARCHAR(100) NOT NULL,
-  propValue     VARCHAR(3900) NOT NULL,
+  propValue     NCLOB NOT NULL,
   CONSTRAINT fpAgentProp_pk PRIMARY KEY (ownerID,name)
 );
 
@@ -52,7 +52,7 @@ CREATE TABLE fpQueue(
   minchats            INT NOT NULL,
   overflow            INT NOT NULL,
   backupQueue         INT NULL,
-  dispatcherClass     VARCHAR(3900) NULL,
+  dispatcherClass     NCLOB NULL,
   CONSTRAINT fpQueue_pk PRIMARY KEY (workgroupID,queueID)
 );
 CREATE INDEX fpqueue_workgroupid_idx ON fpQueue(workgroupID);
@@ -61,7 +61,7 @@ CREATE INDEX fpqueue_queueid_idx ON fpQueue(queueID);
 CREATE TABLE fpDispatcherProp (
   ownerID       INT NOT NULL,
   name          VARCHAR(100) NOT NULL,
-  propValue     VARCHAR(3900) NOT NULL,
+  propValue     NCLOB NOT NULL,
   CONSTRAINT fpDispatcherProp_pk PRIMARY KEY (ownerID,name)
 );
 
@@ -77,7 +77,7 @@ CREATE TABLE fpDispatcher(
 CREATE TABLE fpQueueProp (
   ownerID       INT NOT NULL,
   name          VARCHAR(100) NOT NULL,
-  propValue     VARCHAR(3900) NOT NULL,
+  propValue     NCLOB NOT NULL,
   CONSTRAINT fpQueueProp_pk PRIMARY KEY (ownerID,name)
 );
 
@@ -129,7 +129,7 @@ CREATE TABLE fpSessionMetadata(
 CREATE TABLE fpSessionProp(
   sessionID     varchar(31) NOT NULL,
   name          varchar(100) NOT NULL,
-  propValue     LONG NOT NULL,
+  propValue     NCLOB NOT NULL,
   CONSTRAINT fpSessionProp_pk PRIMARY KEY   (sessionID,name)
 );
 
