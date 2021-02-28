@@ -34,14 +34,18 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class TaskEngine {
 
-    private static TaskEngine instance = new TaskEngine();
+    private static TaskEngine instance;
 
     /**
      * Returns a task engine instance (singleton).
      *
      * @return a task engine.
      */
-    public static TaskEngine getInstance() {
+    public synchronized static TaskEngine getInstance() {
+        if (instance == null) {
+            // Issue #53: Should re-init be allowed after the plugin is shut down?
+            instance = new TaskEngine();
+        }
         return instance;
     }
 
