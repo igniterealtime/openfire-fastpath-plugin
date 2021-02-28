@@ -14,7 +14,7 @@ CREATE TABLE fpWorkgroup(
   minchats            INT NOT NULL,
   requestTimeout      INT NOT NULL,
   offerTimeout        INT NOT NULL,
-  schedule            NVARCHAR(3400) NULL,
+  schedule            TEXT NULL,
   CONSTRAINT fpWorkgroup_pk PRIMARY KEY (workgroupID)
 );
 CREATE INDEX fpWorkgroup_workgroupid_idx on fpWorkgroup(workgroupID);
@@ -22,7 +22,7 @@ CREATE INDEX fpWorkgroup_workgroupid_idx on fpWorkgroup(workgroupID);
 CREATE TABLE fpWorkgroupProp (
   ownerID       INT NOT NULL,
   name          NVARCHAR(100) NOT NULL,
-  propValue     TEXT,
+  propValue     TEXT NOT NULL,
   CONSTRAINT fpWorkgroupProp_pk PRIMARY KEY (ownerID,name)
 );
 
@@ -40,7 +40,7 @@ CREATE INDEX fpagent_agentjid_idx ON fpAgent(agentJID);
 CREATE TABLE fpAgentProp (
   ownerID       INT NOT NULL,
   name          NVARCHAR(100) NOT NULL,
-  propValue     NVARCHAR(3900) NOT NULL,
+  propValue     TEXT NOT NULL,
   CONSTRAINT fpAgentProp_pk PRIMARY KEY (ownerID,name)
 );
 
@@ -63,7 +63,7 @@ CREATE INDEX fpqueue_queueid_idx ON fpQueue(queueID);
 CREATE TABLE fpDispatcherProp (
   ownerID       INT NOT NULL,
   name          NVARCHAR(100) NOT NULL,
-  propValue     NVARCHAR(3900) NOT NULL,
+  propValue     TEXT NOT NULL,
   CONSTRAINT fpDispatcherProp_pk PRIMARY KEY (ownerID,name)
 );
 
@@ -79,7 +79,7 @@ CREATE TABLE fpDispatcher(
 CREATE TABLE fpQueueProp (
   ownerID       INT NOT NULL,
   name          NVARCHAR(100) NOT NULL,
-  propValue     NVARCHAR(3900) NOT NULL,
+  propValue     TEXT NOT NULL,
   CONSTRAINT fpQueueProp_pk PRIMARY KEY (ownerID,name)
 );
 
