@@ -117,7 +117,12 @@ var ofmeet = (function(of)
 
     function joinWorkgroup(form)
     {
-        let iq = converse.env.$iq({to: fastpath, type: 'set'}).c('join-queue', {xmlns: 'http://jabber.org/protocol/workgroup'});
+        let iq = converse.env.$iq({to: fastpath, type: 'set'})
+            .c('join-queue', {xmlns: 'http://jabber.org/protocol/workgroup'})
+            .c('metadata', {xmlns: 'http://jivesoftware.com/protocol/workgroup'})
+            .c('value', {name: 'username'}, 'random-' + Math.random().toString(36).substr(2, 5)) // Spark needs a 'username' metadata field (or it will nullpointer). TODO: fill this with user-provided data. See https://github.com/igniterealtime/openfire-fastpath-plugin/issues/54
+            .up();
+
         iq.c('queue-notifications').up();
         iq.c('x', {xmlns: 'jabber:x:data', type: 'submit'});
 
