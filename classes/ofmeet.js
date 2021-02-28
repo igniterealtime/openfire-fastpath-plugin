@@ -121,6 +121,7 @@ var ofmeet = (function(of)
             .c('join-queue', {xmlns: 'http://jabber.org/protocol/workgroup'})
             .c('metadata', {xmlns: 'http://jivesoftware.com/protocol/workgroup'})
             .c('value', {name: 'username'}, 'random-' + Math.random().toString(36).substr(2, 5)) // Spark needs a 'username' metadata field (or it will nullpointer). TODO: fill this with user-provided data. See https://github.com/igniterealtime/openfire-fastpath-plugin/issues/54
+            .c('value', {name: 'userID'}, 'random-' + Math.random().toString(36).substr(2, 5) + "@fastpath-converse.example.org") // Spark needs a 'userID' metadata field. Smack has added a requirement that this is a bare JID (which Openfire does not require). TODO: see if we can restore an old version for a returning user.
             .up();
 
         iq.c('queue-notifications').up();
