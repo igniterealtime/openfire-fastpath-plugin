@@ -162,8 +162,10 @@ public class UserRequest extends Request {
         DataForm submittedForm = (DataForm)packet.getExtension(DataForm.ELEMENT_NAME,
                 DataForm.NAMESPACE);
 
-        for (FormField field : submittedForm.getFields()) {
-            metaData.put(field.getVariable(), field.getValues());
+        if (submittedForm != null) {
+            for (FormField field : submittedForm.getFields()) {
+                metaData.put(field.getVariable(), field.getValues());
+            }
         }
 
         // Omit certain items
