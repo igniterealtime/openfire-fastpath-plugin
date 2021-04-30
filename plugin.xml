@@ -9,7 +9,7 @@
     <date>tbc.</date>
     <minServerVersion>4.1.1</minServerVersion>
     <databaseKey>fastpath</databaseKey>
-    <databaseVersion>0</databaseVersion>
+    <databaseVersion>1</databaseVersion>
     
     <adminconsole>
         <tab id="workgroup-tab" name="Fastpath"
