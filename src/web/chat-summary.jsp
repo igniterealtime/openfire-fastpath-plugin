@@ -21,10 +21,6 @@
 <head>
     <title>Chat Summary</title>
     <meta name="pageID" content="chat-summary"/>
-    <style type="text/css">@import url( /js/jscalendar/calendar-win2k-cold-1.css );</style>
-    <script type="text/javascript" src="/js/jscalendar/calendar.js"></script>
-    <script type="text/javascript" src="/js/jscalendar/i18n.jsp"></script>
-    <script type="text/javascript" src="/js/jscalendar/calendar-setup.js"></script>
 
     <style type="text/css">
         .textfield {
@@ -135,14 +131,19 @@
 
     if (submit) {
 
-        DateFormat formatter = new SimpleDateFormat("MM/dd/yy");
-
         if (start == null || "".equals(start)) {
             errors = true;
             start = "";
             errorMessage = "Please specify a valid start date.";
         }
         else {
+            DateFormat formatter;
+            if (start.contains("/")) {
+                // This was used by the old calendarjs code. Retain it to not break old links/bookmarks, etc.
+                formatter = new SimpleDateFormat("MM/dd/yy");
+            } else {
+                formatter = new SimpleDateFormat("yyyy-MM-dd");
+            }
             try {
                 startDate = formatter.parse(start);
             }
@@ -161,6 +162,13 @@
         }
         else {
             try {
+                DateFormat formatter;
+                if (end.contains("/")) {
+                    // This was used by the old calendarjs code. Retain it to not break old links/bookmarks, etc.
+                    formatter = new SimpleDateFormat("MM/dd/yy");
+                } else {
+                    formatter = new SimpleDateFormat("yyyy-MM-dd");
+                }
                 endDate = formatter.parse(end);
             }
             catch (Exception e) {
@@ -221,27 +229,9 @@
                 <td class="text" width="1%" nowrap>
                     Choose Date:
                 </td>
-                <td nowrap>
-                    <!-- Start of Date -->
-                    <TABLE border="0">
-                        <tr valign="top">
-                            <td width="1%" nowrap class="text">
-                                From:
-                            </td>
-                            <td width="1%" nowrap class="text"><input type="text" name="startDate" id="startDate" size="15" value="<%= start != null ? start : ""%>"/><br/>
-                            Use mm/dd/yy</td>
-                            <td width="1%" nowrap>&nbsp;<img src="images/icon_calendarpicker.gif" vspace="3" id="startDateTrigger"></td>
-
-
-                            <TD width="1%" nowrap class="text">
-                                To:
-                            </td>
-                            <td width="1%" nowrap class="text"><input type="text" name="endDate" id="endDate" size="15" value="<%= end != null ? end : "" %>"/><br/>
-                             Use mm/dd/yy</td>
-                            <td>&nbsp;<img src="images/icon_calendarpicker.gif" vspace="3" id="endDateTrigger"></td>
-                         </TR>
-                    </TABLE>
-                    <!-- End Of Date -->
+                <td class="text">
+                    <label for="startDate">From:</label>&nbsp;<input type="date" name="startDate" id="startDate" size="15" value="<%= start != null ? start : ""%>"/>
+                    <label for="endDate">To:</label>&nbsp;<input type="date" name="endDate" id="endDate" size="15" value="<%= end != null ? end : "" %>"/>
                 </td>
             </tr>
             <tr>
@@ -372,22 +362,6 @@
             endDateField.value= "";
         }
     }
-
-    Calendar.setup(
-    {
-        inputField  : "startDate",         // ID of the input field
-        ifFormat    : "%m/%d/%y",    // the date format
-        button      : "startDateTrigger",       // ID of the button
-        onUpdate    :  catcalc
-    });
-
-    Calendar.setup(
-    {
-        inputField  : "endDate",         // ID of the input field
-        ifFormat    : "%m/%d/%y",    // the date format
-        button      : "endDateTrigger",       // ID of the button
-        onUpdate    :  catcalc
-    });
 </script>
 </body>
 </html>
