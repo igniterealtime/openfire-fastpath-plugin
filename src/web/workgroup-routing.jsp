@@ -10,7 +10,7 @@
 <%@ page import="org.xmpp.forms.FormField" %>
 <%@ page import="org.xmpp.packet.JID" %>
 <%@ page import="java.util.Collection" %>
-<%@ page import="org.jivesoftware.util.Log"%>
+<%@ page import="org.slf4j.LoggerFactory"%>
 <%@ page import="org.jivesoftware.util.NotFoundException,
         org.jivesoftware.openfire.fastpath.dataforms.FormManager,
         org.jivesoftware.openfire.user.UserNotFoundException"%>
@@ -28,7 +28,7 @@
           workgroup = workgroupManager.getWorkgroup(new JID(wgID));
       }
       catch (UserNotFoundException e) {
-          Log.error(e);
+          LoggerFactory.getLogger("workgroup-routing.jsp").error(e.toString());
       }
       FormManager formManager = FormManager.getInstance();
       DataForm dataForm = formManager.getDataForm(workgroup);
@@ -158,7 +158,7 @@
                     rq = workgroup.getRequestQueue(rule.getQueueID());
                 }
                 catch (NotFoundException e) {
-                    Log.error(e);
+                    LoggerFactory.getLogger("workgroup-routing.jsp").error(e.toString());
                 }
 
                 int rulePosition = rule.getPosition();

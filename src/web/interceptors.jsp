@@ -19,6 +19,7 @@
 <%@ page import="java.beans.*,
                  java.util.*,
                  java.lang.reflect.Method,
+				 org.slf4j.LoggerFactory,					 
                  org.jivesoftware.xmpp.workgroup.WorkgroupManager,
                  org.jivesoftware.xmpp.workgroup.Workgroup,
                  org.xmpp.packet.JID,
@@ -436,7 +437,7 @@
             error = newClassname.trim() + " must have a valid constructor";
         }
         catch (Exception e) {
-            Log.error(e);
+            LoggerFactory.getLogger("interceptors.jsp").error(e.toString());
             error = "Could not load class " + newClassname.trim();
         }
         String redirect = "interceptors.jsp?errorMessage=" + error + "&managerType=" + managerType;

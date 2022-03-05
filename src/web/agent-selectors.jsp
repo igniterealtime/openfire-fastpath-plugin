@@ -20,10 +20,10 @@
                  org.jivesoftware.xmpp.workgroup.dispatcher.AgentSelector,
                  org.jivesoftware.util.ParamUtils,
                  java.util.List,
+				 org.slf4j.LoggerFactory,
                  org.jivesoftware.util.StringUtils,
                  org.jivesoftware.openfire.fastpath.util.WorkgroupUtils,
-                 org.jivesoftware.util.ClassUtils,
-                 org.jivesoftware.util.Log"
+                 org.jivesoftware.util.ClassUtils"
     errorPage="workgroup-error.jsp"
 %>
 <% // Get parameters
@@ -59,7 +59,7 @@
             error = newClassname.trim() + " must have a valid constructor";
         }
         catch (Exception e) {
-            Log.error(e);
+            LoggerFactory.getLogger("agent-selectors.jsp").error(e.toString());
             error = "Could not load class " + newClassname.trim();
         }
         String redirect = "agent-selectors.jsp?errorMessage=" + error;

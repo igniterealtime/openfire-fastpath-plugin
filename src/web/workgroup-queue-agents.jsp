@@ -8,7 +8,7 @@
                 org.jivesoftware.xmpp.workgroup.WorkgroupAdminManager,
                 org.jivesoftware.xmpp.workgroup.WorkgroupManager,
                 org.jivesoftware.xmpp.workgroup.dispatcher.DispatcherInfo,
-                org.jivesoftware.util.Log,
+				org.slf4j.LoggerFactory,	
                 org.jivesoftware.util.ParamUtils,
                 org.jivesoftware.openfire.group.Group,
                 org.jivesoftware.openfire.group.GroupManager,
@@ -16,7 +16,7 @@
         errorPage="workgroup-error.jsp" %>
 <%@ page import="org.xmpp.packet.JID" %><%@ page import="java.util.HashMap" %><%@ page import="java.util.Iterator" %><%@ page import="java.util.LinkedList" %><%@ page import="java.util.List" %><%@ page import="java.util.Map" %><%@ page import="java.util.StringTokenizer" %>
 <%@ page import="org.jivesoftware.xmpp.workgroup.AgentNotFoundException"%>
-<%@ page import="org.jivesoftware.util.Log"%><%@ page import="org.jivesoftware.openfire.group.GroupNotFoundException"%>
+<%@ page import="org.jivesoftware.openfire.group.GroupNotFoundException"%>
 <%@ page import="org.jivesoftware.openfire.user.UserManager"%>
 <%@ page import="org.jivesoftware.openfire.fastpath.util.WorkgroupUtils" %>
 <%
@@ -75,7 +75,7 @@
             }
             catch (Exception e) {
                 errors.put("groups", "Group not found.");
-                Log.error(e);
+                LoggerFactory.getLogger("workgroup-queue-agents.jsp").error(e.toString());
             }
         }
 
@@ -134,7 +134,7 @@
                 queue.removeMember(agent);
             }
             catch (AgentNotFoundException e1) {
-                Log.error(e1);
+				LoggerFactory.getLogger("workgroup-queue-agents.jsp").error(e1.toString());
             }
         }
 
@@ -151,7 +151,7 @@
                 queue.removeGroup(group);
             }
             catch (GroupNotFoundException e1) {
-                Log.error(e1);
+				LoggerFactory.getLogger("workgroup-queue-agents.jsp").error(e1.toString());
             }
         }
 

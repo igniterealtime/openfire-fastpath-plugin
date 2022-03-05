@@ -4,10 +4,10 @@
             org.jivesoftware.openfire.fastpath.history.ChatSession,
             org.jivesoftware.openfire.fastpath.history.ChatTranscriptManager,
             org.jivesoftware.xmpp.workgroup.Workgroup,
+			org.slf4j.LoggerFactory,			
             org.jivesoftware.xmpp.workgroup.WorkgroupManager,
             org.jivesoftware.xmpp.workgroup.utils.ModelUtil" %>
 <%@ page import="org.jivesoftware.database.DbConnectionManager" %>
-<%@ page import="org.jivesoftware.util.Log" %>
 <%@ page import="org.jivesoftware.util.ParamUtils" %>
 <%@ page import="org.xmpp.packet.JID" %>
 <%@ page import="java.sql.Connection" %>
@@ -151,7 +151,7 @@
                 errors = true;
                 start = "";
                 errorMessage = "Please specify a valid start date.";
-                Log.error(e);
+                LoggerFactory.getLogger("chat-summary.jsp").error(e.toString());
             }
         }
 
@@ -175,7 +175,7 @@
                 errors = true;
                 end = "";
                 errorMessage = "Please specify a valid end date.";
-                Log.error(e);
+                LoggerFactory.getLogger("chat-summary.jsp").error(e.toString());
             }
         }
     }

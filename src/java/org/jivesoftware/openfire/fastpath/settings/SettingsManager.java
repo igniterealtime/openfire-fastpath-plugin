@@ -22,6 +22,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 import org.dom4j.QName;
@@ -30,6 +33,7 @@ import org.jivesoftware.util.Log;
 import org.jivesoftware.xmpp.workgroup.Workgroup;
 
 public class SettingsManager {
+    private static final Logger Log = LoggerFactory.getLogger(SettingsManager.class);	
     private final Map<String, String> settings = new HashMap<String, String>();
     private List<Element> elementList = new ArrayList<Element>();
     private WorkgroupSettings workgroupSettings;

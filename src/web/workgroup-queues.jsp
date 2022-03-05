@@ -17,7 +17,7 @@
                  org.jivesoftware.xmpp.workgroup.utils.ModelUtil,
                  org.jivesoftware.util.StringUtils,
                  org.jivesoftware.util.NotFoundException,
-                 org.jivesoftware.util.Log,
+                 org.slf4j.LoggerFactory,	
                  org.jivesoftware.openfire.fastpath.dataforms.FormUtils,
                  org.xmpp.forms.FormField, org.xmpp.forms.DataForm"
         errorPage="/error.jsp"%>
@@ -447,7 +447,7 @@ else if (deleted) { %>
             rq = workgroup.getRequestQueue(rule.getQueueID());
         }
         catch (NotFoundException e) {
-            Log.error(e);
+            LoggerFactory.getLogger("workgroup-queues.jsp").error(e.toString());
         }
 
         // Do not show rule.

@@ -3,7 +3,7 @@
                  org.jivesoftware.xmpp.workgroup.WorkgroupManager,
                  org.jivesoftware.xmpp.workgroup.spi.ChatHistoryUtils,
                  org.jivesoftware.xmpp.workgroup.utils.ModelUtil,
-                 org.jivesoftware.util.Log,
+				 org.slf4j.LoggerFactory,	
                  org.jivesoftware.util.ParamUtils,
                  org.xmpp.packet.JID,
                  java.text.DateFormat,
@@ -47,7 +47,7 @@
                 errors = true;
                 start = "";
                 errorMessage = "Please specify a valid start date.";
-                Log.error(e);
+                LoggerFactory.getLogger("usage-summary.jsp").error(e.toString());
             }
         }
 
@@ -71,7 +71,7 @@
                 errors = true;
                 end = "";
                 errorMessage = "Please specify a valid end date.";
-                Log.error(e);
+                LoggerFactory.getLogger("usage-summary.jsp").error(e.toString());
             }
         }
     }
