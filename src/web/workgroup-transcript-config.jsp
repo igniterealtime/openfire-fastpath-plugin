@@ -45,7 +45,6 @@
         props.deleteProperty(context + ".fromEmail");
         props.deleteProperty(context + ".subject");
         props.deleteProperty(context + ".message");
-         System.out.println("DELTED");
      }
      else {
          from = props.getProperty(context + ".from");
