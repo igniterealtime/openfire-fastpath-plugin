@@ -79,7 +79,6 @@
 
         // Save users
         if (ModelUtil.hasLength(users)) {
-            System.out.println(users);
             props.setProperty("monitors", users);
         }
         else {
