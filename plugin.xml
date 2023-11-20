@@ -6,7 +6,7 @@
     <description>Support for managed queued chat requests, such as a support team might use.</description>
     <author>Ignite Realtime</author>
     <version>${project.version}</version>
-    <date>tbc.</date>
+    <date>2023-11-20</date>
     <minServerVersion>4.1.1</minServerVersion>
     <databaseKey>fastpath</databaseKey>
     <databaseVersion>1</databaseVersion>
