@@ -88,7 +88,7 @@
                 "<%= descriptor.getBeanClass().getName() %>",
                 "<%= descriptor.getValue("version") %>",
                 "<%= descriptor.getValue("author") %>",
-                "<%= StringUtils.replace(descriptor.getShortDescription(), "\"", "\\\"") %>"
+                "<%= descriptor.getShortDescription().replaceAll("\"", "\\\"") %>"
             )
 <%          if ((availableAgentSelectors.size() - i) > 1) { %>
                 ,

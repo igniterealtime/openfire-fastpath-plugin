@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2008 Jive Software. All rights reserved.
+ * Copyright (C) 2004-2008 Jive Software, 2024 Ignite Realtime Foundation. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,8 @@ package org.jivesoftware.xmpp.workgroup.search;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -137,7 +139,7 @@ public class ChatSearchManager implements WorkgroupEventListener {
      * Holds the path to the parent folder of the folders that will store the workgroup
      * index files.
      */
-    private static String parentFolder = JiveGlobals.getHomeDirectory() + File.separator + "index";
+    private static Path parentFolder = JiveGlobals.getHomePath().resolve("index");
     private static final long ONE_HOUR = 60 * 60 * 1000;
 
     /**
@@ -147,7 +149,7 @@ public class ChatSearchManager implements WorkgroupEventListener {
      */
     private Workgroup workgroup;
     private Analyzer indexerAnalyzer;
-    private String searchDirectory;
+    private Path searchDirectory;
     private Searcher searcher = null;
     private IndexReader searcherReader = null;
     ReadWriteLock searcherLock = new ReentrantReadWriteLock();
@@ -180,9 +182,12 @@ public class ChatSearchManager implements WorkgroupEventListener {
 
     static {
         // Check if we need to create the parent folder
-        File dir = new File(parentFolder);
-        if (!dir.exists() || !dir.isDirectory()) {
-            dir.mkdir();
+        if (!Files.exists(parentFolder) || !Files.isDirectory(parentFolder)) {
+            try {
+                Files.createDirectories(parentFolder);
+            } catch (IOException e) {
+                Log.warn("Unable to create folder: " + parentFolder, e);
+            }
         }
     }
 
@@ -299,7 +304,7 @@ public class ChatSearchManager implements WorkgroupEventListener {
 
     ChatSearchManager(Workgroup workgroup) {
         this.workgroup = workgroup;
-        searchDirectory = parentFolder + File.separator + workgroup.getJID().getNode();
+        searchDirectory = parentFolder.resolve(workgroup.getJID().getNode());
         loadAnalyzer();
         loadLastUpdated();
         WorkgroupEventDispatcher.addListener(this);
@@ -460,9 +465,8 @@ public class ChatSearchManager implements WorkgroupEventListener {
      *                     there is a problem adding a document to the index.
      */
     public synchronized void updateIndex(boolean forceUpdate) throws IOException {
-        // Check that the index files exist
-        File dir = new File(searchDirectory);
-        boolean create = !dir.exists() || !dir.isDirectory();
+        // Check that the index files exist;
+        boolean create = !Files.exists(searchDirectory) || !Files.isDirectory(searchDirectory);
         if (lastUpdated == null || create) {
             // Recreate the index since it was never created or the index files disappeared
             rebuildIndex();
@@ -511,12 +515,12 @@ public class ChatSearchManager implements WorkgroupEventListener {
                 // Ignore.
             }
             // Delete index files
-            String[] files = new File(searchDirectory).list();
+            String[] files = searchDirectory.toFile().list();
             for (int i = 0; i < files.length; i++) {
-                File file = new File(searchDirectory, files[i]);
+                File file = new File(searchDirectory.toFile(), files[i]);
                 file.delete();
             }
-            new File(searchDirectory).delete();
+            searchDirectory.toFile().delete();
             // Delete dates from the database
             deleteDates();
             // Remove this instance from the list of instances
@@ -543,8 +547,8 @@ public class ChatSearchManager implements WorkgroupEventListener {
     public Searcher getSearcher() throws IOException {
         synchronized (indexerAnalyzer) {
             if (searcherReader == null) {
-                if (searchDirectory != null && IndexReader.indexExists(searchDirectory)) {
-                    searcherReader = IndexReader.open(searchDirectory);
+                if (searchDirectory != null && IndexReader.indexExists(searchDirectory.toFile())) {
+                    searcherReader = IndexReader.open(searchDirectory.toFile());
                     searcher = new IndexSearcher(searcherReader);
                 }
                 else {
@@ -553,7 +557,7 @@ public class ChatSearchManager implements WorkgroupEventListener {
                         Log.warn("Search " +
                                 "directory not set, you must rebuild the index.");
                     }
-                    else if (!IndexReader.indexExists(searchDirectory)) {
+                    else if (!IndexReader.indexExists(searchDirectory.toFile())) {
                         Log.warn("Search " +
                                 "directory " + searchDirectory + " does not appear to " +
                                 "be a valid search index. You must rebuild the index.");
@@ -945,7 +949,7 @@ public class ChatSearchManager implements WorkgroupEventListener {
      * existing index should be used if it's found there.
      */
     private IndexWriter getWriter(boolean create) throws IOException {
-        IndexWriter writer = new IndexWriter(searchDirectory, indexerAnalyzer, create);
+        IndexWriter writer = new IndexWriter(searchDirectory.toFile(), indexerAnalyzer, create);
         return writer;
     }
 

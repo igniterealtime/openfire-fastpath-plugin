@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2008 Jive Software. All rights reserved.
+ * Copyright (C) 2004-2008 Jive Software, 2024 Ignite Realtime Foundation. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -334,9 +334,9 @@ public class ChatSearch {
     }
 
     private String stripWildcards(String string) {
-        string = StringUtils.replace(string, "*", "");
-        string = StringUtils.replace(string, "?", "");
-        string = StringUtils.replace(string, "~", "");
+        string = string.replaceAll("\\*", "");
+        string = string.replaceAll("\\?", "");
+        string = string.replaceAll("~", "");
         return string;
     }
 
