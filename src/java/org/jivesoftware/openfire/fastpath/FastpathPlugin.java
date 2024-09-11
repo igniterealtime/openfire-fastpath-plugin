@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2008 Jive Software. All rights reserved.
+ * Copyright (C) 2004-2008 Jive Software, 2024 Ignite Realtime Foundation. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,9 @@
 package org.jivesoftware.openfire.fastpath;
 
 import java.io.File;
-import java.io.FileFilter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 
 import org.jivesoftware.openfire.cluster.ClusterEventListener;
@@ -40,9 +42,6 @@ import org.xmpp.packet.JID;
 
 import org.eclipse.jetty.apache.jsp.JettyJasperInitializer;
 import org.eclipse.jetty.plus.annotation.ContainerInitializer;
-import org.eclipse.jetty.server.handler.ContextHandlerCollection;
-import org.eclipse.jetty.servlet.*;
-import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.webapp.WebAppContext;
 
 import org.apache.tomcat.InstanceManager;
@@ -64,25 +63,14 @@ public class FastpathPlugin implements Plugin, ClusterEventListener {
     private WebAppContext context;
 
     public void initializePlugin(PluginManager manager, File pluginDirectory) {
-        // Check if we Enterprise is installed and stop loading this plugin if found
-        File pluginDir = new File(JiveGlobals.getHomeDirectory(), "plugins");
-        File[] jars = pluginDir.listFiles(new FileFilter() {
-            public boolean accept(File pathname) {
-                String fileName = pathname.getName().toLowerCase();
-                return (fileName.equalsIgnoreCase("enterprise.jar"));
-            }
-        });
-        if (jars.length > 0) {
-            // Do not load this plugin since Enterprise is still installed
-            System.out.println("Enterprise plugin found. Stopping Fastpath Plugin");
-            throw new IllegalStateException("This plugin cannot run next to the Enterprise plugin");
-        }
-
         // Make sure that the fastpath folder exists under the home directory
-        File fastpathDir = new File(JiveGlobals.getHomeDirectory() +
-            File.separator + "fastpath");
-        if (!fastpathDir.exists()) {
-            fastpathDir.mkdirs();
+        Path fastpathDir = JiveGlobals.getHomePath().resolve("fastpath");
+        if (!Files.exists(fastpathDir)) {
+            try {
+                Files.createDirectories(fastpathDir);
+            } catch (IOException e) {
+                throw new IllegalStateException("Unable to create fastpath directory: " + fastpathDir, e);
+            }
         }
 
         workgroupManagerStart();

@@ -192,7 +192,7 @@
     }
 
     private String escapeHTML(String html) {
-        html = StringUtils.replace(html, "\"", "&quot;");
+        html = html.replaceAll("\"", "&quot;");
         return StringUtils.escapeHTMLTags(html);
     }
 %>
@@ -598,7 +598,7 @@ var routerInfo = new Array(
         "<%= descriptor.getBeanClass().getName() %>",
         "<%= descriptor.getValue("version") %>",
         "<%= descriptor.getValue("author") %>",
-        "<%= StringUtils.replace(descriptor.getShortDescription(), "\"", "\\\"") %>"
+        "<%= descriptor.getShortDescription().replaceAll("\"", "\\\"") %>"
     )
 <%          if ((interceptorManager.getAvailableInterceptors().size() - i) > 1) { %>
         ,
