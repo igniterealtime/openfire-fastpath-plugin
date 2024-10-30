@@ -188,7 +188,6 @@ public class FormManager {
         if (form != null) {
             XStream xstream = new XStream();
             xstream.setClassLoader(this.getClass().getClassLoader());
-
             try {
                 return (DataForm) xstream.fromXML(form);
             }
@@ -209,6 +208,11 @@ public class FormManager {
             if (form != null) {
                 XStream xstream = new XStream();
                 xstream.setClassLoader(this.getClass().getClassLoader());
+                xstream.allowTypes(new Class[] {
+                		WorkgroupForm.class,
+                		FormElement.class
+                		
+                });
 
                 try {
                     Object object = xstream.fromXML(form);

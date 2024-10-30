@@ -132,7 +132,6 @@ public class WorkgroupUtils {
     public synchronized static List<Class<? extends Dispatcher>> getAvailableDispatcherClasses() {
         final List<Class<? extends Dispatcher>> result = new ArrayList<>();
 
-        // First, add in build-in list of dispatchers.
         result.addAll(getBuiltInDispatcherClasses());
 
         // Now get custom algorithms.
@@ -148,6 +147,8 @@ public class WorkgroupUtils {
                 Log.error("An exception occurred while trying to load class with name '{}' from property 'dispatcher.classes'", className, e);
             }
         }
+        // Last, add in build-in list of dispatchers.when have custom dispatcher classes set first.
+        result.addAll(getBuiltInDispatcherClasses());
         return result;
     }
 

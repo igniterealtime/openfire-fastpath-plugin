@@ -239,7 +239,11 @@ public abstract class Request {
         offerElement.add(getSessionElement());
         addOfferContent(offerElement);
 
-        queue.getWorkgroup().getChatBot().makeOffer(requestID, session.getJID(), getUserJID().toString());
+        Chatbot chatbot=queue.getWorkgroup().getChatBot();
+        if(chatbot!=null) {
+        	chatbot.makeOffer(requestID, session.getJID(), getUserJID().toString());
+        }
+
         return session.sendOffer(offer, offerPacket);
     }
 
