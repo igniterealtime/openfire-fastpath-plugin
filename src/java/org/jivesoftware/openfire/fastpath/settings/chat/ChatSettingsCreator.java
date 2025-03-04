@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 1999-2008 Jive Software. All rights reserved.
+ * Copyright (C) 1999-2008 Jive Software, 2025 Ignite Realtime Foundation. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,8 +36,6 @@ import org.jivesoftware.xmpp.workgroup.utils.ModelUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xmpp.packet.JID;
-
-import com.thoughtworks.xstream.XStream;
 
 /**
  * Creates the default settings for the Web Chat UI. This includes the Web Chat UI
@@ -395,11 +393,6 @@ public class ChatSettingsCreator {
      * @param workgroupJID the full-jid of the workgroup.
      */
     public void createDefaultSettings(JID workgroupJID) {
-        final XStream xstream = new XStream();
-        xstream.alias("ChatSettings", ChatSettings.class);
-        xstream.alias("Key", KeyEnum.class);
-        xstream.alias("Setting", ChatSetting.class);
-
         createImageSettings(workgroupJID);
         createTextSettings(workgroupJID);
         createBotSettings(workgroupJID);
