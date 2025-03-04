@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 1999-2006 Jive Software. All rights reserved.
+ * Copyright (C) 1999-2006 Jive Software. 2025 Ignite Realtime Foundation. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.dom4j.DocumentFactory;
+import org.dom4j.Node;
+import org.dom4j.QName;
 import org.jivesoftware.xmpp.workgroup.DbProperties;
 import org.jivesoftware.xmpp.workgroup.UnauthorizedException;
 import org.jivesoftware.xmpp.workgroup.Workgroup;
@@ -31,6 +34,7 @@ import org.xmpp.forms.DataForm;
 import org.xmpp.forms.FormField;
 
 import com.thoughtworks.xstream.XStream;
+import org.xmpp.packet.PacketExtension;
 
 
 public class FormManager {
@@ -73,8 +77,7 @@ public class FormManager {
         // Save Web Form for editing
         WorkgroupForm workgroupForm = getWebForm(workgroup);
         if (workgroupForm != null) {
-            XStream xstream = new XStream();
-            String xmlToSave = xstream.toXML(workgroupForm);
+            String xmlToSave = generateXStream().toXML(workgroupForm);
 
             DbProperties props = workgroup.getProperties();
             String context = "jive.webform.wg";
@@ -164,8 +167,7 @@ public class FormManager {
             }
         }
 
-        XStream xstream = new XStream();
-        String xmlToSave = xstream.toXML(dataForm);
+        String xmlToSave = generateXStream().toXML(dataForm);
 
         DbProperties props = workgroup.getProperties();
         String context = "jive.dataform.wg";
@@ -186,10 +188,8 @@ public class FormManager {
         String form = props.getProperty(context);
 
         if (form != null) {
-            XStream xstream = new XStream();
-            xstream.setClassLoader(this.getClass().getClassLoader());
             try {
-                return (DataForm) xstream.fromXML(form);
+                return (DataForm) generateXStream().fromXML(form);
             }
             catch (Exception e) {
                 Log.error(e.getMessage(), e);
@@ -206,16 +206,8 @@ public class FormManager {
             String form = props.getProperty(context);
 
             if (form != null) {
-                XStream xstream = new XStream();
-                xstream.setClassLoader(this.getClass().getClassLoader());
-                xstream.allowTypes(new Class[] {
-                		WorkgroupForm.class,
-                		FormElement.class
-                		
-                });
-
                 try {
-                    Object object = xstream.fromXML(form);
+                    Object object = generateXStream().fromXML(form);
                     WorkgroupForm workgroupForm = (WorkgroupForm)object;
                     if (workgroupForm != null) {
                         addWorkgroupForm(workgroup, workgroupForm);
@@ -266,5 +258,17 @@ public class FormManager {
         saveWorkgroupForm(workgroup);
     }
 
-
+    protected XStream generateXStream() {
+        final XStream xstream = new XStream();
+        xstream.setClassLoader(this.getClass().getClassLoader());
+        xstream.allowTypeHierarchy(Node.class);
+        xstream.allowTypeHierarchy(PacketExtension.class);
+        xstream.allowTypes(new Class[] {
+            DocumentFactory.class,
+            QName.class,
+            WorkgroupForm.class,
+            FormElement.class
+        });
+        return xstream;
+    }
 }

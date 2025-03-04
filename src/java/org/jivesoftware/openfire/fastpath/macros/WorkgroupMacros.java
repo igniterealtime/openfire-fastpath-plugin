@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 1999-2008 Jive Software. All rights reserved.
+ * Copyright (C) 1999-2008 Jive Software, 2025 Ignite Realtime Foundation. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,7 +38,7 @@ public class WorkgroupMacros {
     private static WorkgroupMacros singleton;
 
     private static final Object LOCK = new Object();
-    private XStream xstream = new XStream();
+    private final XStream xstream;
 
     /**
      * Returns the singleton instance of <CODE>WorkgroupMacros</CODE>,
@@ -63,9 +63,16 @@ public class WorkgroupMacros {
     private WorkgroupMacros() {
         // Load macros
         WorkgroupManager workgroupManager = WorkgroupManager.getInstance();
+
+        xstream = new XStream();
+        XStream xstream = new XStream();
+        xstream.setClassLoader(this.getClass().getClassLoader());
+        xstream.allowTypes(new Class[] {
+            Macro.class,
+            MacroGroup.class
+        });
         xstream.alias("macro", Macro.class);
         xstream.alias("macrogroup", MacroGroup.class);
-
 
         for (Workgroup workgroup : workgroupManager.getWorkgroups()) {
             // Load from DB.

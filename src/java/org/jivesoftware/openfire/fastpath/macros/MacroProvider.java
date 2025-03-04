@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 1999-2008 Jive Software. All rights reserved.
+ * Copyright (C) 1999-2008 Jive Software, 2025 Ignite Realtime Foundation. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -118,6 +118,11 @@ public class MacroProvider implements WorkgroupProvider {
 
             DbProperties props = agent.getProperties();
             XStream xstream = new XStream();
+            xstream.setClassLoader(this.getClass().getClassLoader());
+            xstream.allowTypes(new Class[] {
+                Macro.class,
+                MacroGroup.class
+            });
             xstream.alias("macro", Macro.class);
             xstream.alias("macrogroup", MacroGroup.class);
             MacroGroup group = (MacroGroup)xstream.fromXML(personalMacro);
