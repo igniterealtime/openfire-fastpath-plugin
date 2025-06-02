@@ -254,7 +254,7 @@ public abstract class Request {
      * @param session the agent session that will get the revoke.
      * @param queue queue that is sending the offer.
      */
-    public void sendRevoke(AgentSession session, RequestQueue queue) {
+    public void sendRevoke(AgentSession session, RequestQueue queue, String reason) {
         IQ agentRevoke = new IQ();
         agentRevoke.setFrom(queue.getWorkgroup().getJID());
         agentRevoke.setTo(session.getJID());
@@ -263,7 +263,7 @@ public abstract class Request {
         Element revoke = agentRevoke.setChildElement("offer-revoke", "http://jabber.org/protocol/workgroup");
         revoke.addAttribute("id", requestID);
         revoke.addAttribute("jid", getUserJID().toString());
-        revoke.addElement("reason").setText("The offer has timed out");
+        revoke.addElement("reason").setText(reason);
         revoke.add(getSessionElement());
         addRevokeContent(revoke);
 
