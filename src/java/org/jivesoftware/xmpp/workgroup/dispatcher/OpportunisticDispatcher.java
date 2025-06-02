@@ -82,7 +82,7 @@ public class OpportunisticDispatcher extends AbstractDispatcher
             // Create the room and send the invitations
             offer.invite(selectedAgent);
 
-            // Notify the other agents tat accepted that the offer process has finished. Other pending sessions will
+            // Notify the other agents that accepted that the offer process has finished. Other pending sessions will
             // already have been notified.
             for (AgentSession offeredAgent : offeredAgents) {
                 offeredAgent.removeOffer(offer);
@@ -90,7 +90,7 @@ public class OpportunisticDispatcher extends AbstractDispatcher
                     continue;
                 }
                 Log.debug("Offer for request: {} REVOKING from agent that was also offered this request: {}", offer.getRequest(), offeredAgent.getJID());
-                offer.getRequest().sendRevoke(offeredAgent, queue);
+                offer.getRequest().sendRevoke(offeredAgent, queue, "The offer has timed out");
             }
 
             if (offer.getRequest() instanceof UserRequest) {

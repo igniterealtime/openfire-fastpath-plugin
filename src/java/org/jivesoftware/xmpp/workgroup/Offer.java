@@ -221,7 +221,7 @@ public class Offer {
         Log.debug("Accepted or not: send a revocation to all pending sessions.");
         try {
             for (AgentSession session : pendingSessions) {
-                request.sendRevoke(session, queue);
+                request.sendRevoke(session, queue, "The offer has timed out");
 
                 if (!isAccepted()) {
                     Log.debug("Not accepted. Rejecting...");
@@ -240,10 +240,10 @@ public class Offer {
         // Handle when customer cancels.
         if (!pendingSessions.isEmpty() || !acceptedSessions.isEmpty()) {
             for (AgentSession session : pendingSessions) {
-                request.sendRevoke(session, queue);
+                request.sendRevoke(session, queue, "User canceled");
             }
             for (AgentSession session : acceptedSessions) {
-                request.sendRevoke(session, queue);
+                request.sendRevoke(session, queue, "User canceled");
             }
             pendingSessions.clear();
             acceptedSessions.clear();
