@@ -31,6 +31,7 @@ import org.jivesoftware.xmpp.workgroup.Workgroup;
 import org.jivesoftware.xmpp.workgroup.WorkgroupManager;
 import org.jivesoftware.xmpp.workgroup.interceptor.RoomInterceptorManager;
 import org.jivesoftware.xmpp.workgroup.routing.RoutingManager;
+import org.jivesoftware.xmpp.workgroup.spi.WorkgroupCompatibleClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xmpp.muc.Invitation;
@@ -45,9 +46,9 @@ import org.xmpp.packet.PacketError;
  * @author Gaston Dombiak
  */
 public class TransferRequest extends Request {
-    
+
     private static final Logger Log = LoggerFactory.getLogger(TransferRequest.class);
-    
+
     /**
      * Time limit to wait for the invitee to join the support room. The limit is verified once the agent
      * accepted the offer or a MUC invitation was sent to the user.
@@ -63,6 +64,14 @@ public class TransferRequest extends Request {
      * Check out actualInvitee to learn the actual entity that got the transfer offer.
      */
     private JID invitee;
+    /**
+     * Only used for transfer to agent if we want to force changing workgroup (queue) of and target agent
+     */
+    private Workgroup inviteeWorkgroup;
+    /**
+     * Used to store which queue is selected to transfer to if offer type is selected
+     */
+    private RequestQueue inviteeQueue;
     /**
      * JID of the entity that ended up receiving the transfer offer.
      */
@@ -89,6 +98,7 @@ public class TransferRequest extends Request {
         invitee = new JID(iq.elementTextTrim("invitee"));
         reason = iq.elementTextTrim("reason");
         this.workgroup = workgroup;
+        this.inviteeWorkgroup = workgroup;
         String jid = sessionElement.attributeValue("workgroup");
         try {
             if (jid == null) {
@@ -96,14 +106,19 @@ public class TransferRequest extends Request {
                 // that received the user request and that is making the transfer is the
                 // same workgroup.
                 userRequest = workgroup.getUserRequest(sessionID);
-            }
-            else {
+            } else {
                 JID workgroupJID = new JID(jid);
-        // Replace the workgroup if the original offer originated from a different
-        // workgroup
-        this.workgroup = WorkgroupManager.getInstance().getWorkgroup(workgroupJID);
-        userRequest = this.workgroup.getUserRequest(sessionID);
+                // Replace the workgroup if the original offer originated from a different
+                // workgroup
+                this.workgroup = WorkgroupManager.getInstance().getWorkgroup(workgroupJID);
+                userRequest = this.workgroup.getUserRequest(sessionID);
             }
+
+            Element workgroupElement = iq.element("workgroup");
+            if (workgroupElement != null && workgroupElement.attributeValue("jid") != null) {
+                this.inviteeWorkgroup = WorkgroupManager.getInstance().getWorkgroup(new JID(workgroupElement.attributeValue("jid")));
+            }
+
             // Notify the user request that is now related to this new request
             userRequest.addRelatedRequest(this);
             // Add metadata of original user request to this offer
@@ -128,21 +143,20 @@ public class TransferRequest extends Request {
             }
 
             // Only send muc invites to a particular user.
-            if (true) {
+            if (false) {
                 // Invitee is not an agent so send a standard MUC room invitation
-                sendMUCInvitiation();
+                sendMUCInvitation(null);
                 // Keep track when the invitation was sent to the user
                 offerAccepted = Instant.now();
             }
             else {
                 // Invite the agent to the room by sending an offer
-                Workgroup workgroup = agentSession.getWorkgroups().iterator().next();
-                RequestQueue requestQueue = workgroup.getRequestQueues().iterator().next();
+                inviteeQueue = inviteeWorkgroup.getRequestQueues().iterator().next();
                 // Add the requested agent as the initial target agent to get the offer
                 getMetaData().put("agent", Arrays.asList(invitee.toString()));
                 getMetaData().put("ignore", Arrays.asList(inviter.toBareJID()));
                 // Dispatch the request
-                requestQueue.getDispatcher().injectRequest(this);
+                inviteeQueue.getDispatcher().injectRequest(this);
             }
         }
         else if (Type.queue == type) {
@@ -154,10 +168,10 @@ public class TransferRequest extends Request {
                 return;
             }
             try {
-                RequestQueue requestQueue = targetWorkgroup.getRequestQueue(invitee.getResource());
+                inviteeQueue = targetWorkgroup.getRequestQueue(invitee.getResource());
                 getMetaData().put("ignore", Arrays.asList(inviter.toBareJID()));
                 // Dispatch the request
-                requestQueue.getDispatcher().injectRequest(this);
+                inviteeQueue.getDispatcher().injectRequest(this);
             }
             catch (NotFoundException e) {
                 // No queue was found for the specified invitee. Send a Message with the error
@@ -168,10 +182,10 @@ public class TransferRequest extends Request {
             // Select the best queue based on the original request
             Workgroup targetWorkgroup = WorkgroupManager.getInstance().getWorkgroup(invitee.getNode());
             if (targetWorkgroup != null) {
-                RequestQueue requestQueue = RoutingManager.getInstance().getBestQueue(targetWorkgroup, userRequest);
+                inviteeQueue = RoutingManager.getInstance().getBestQueue(targetWorkgroup, userRequest);
                 getMetaData().put("ignore", Arrays.asList(inviter.toBareJID()));
                 // Send offer to the best again available in the requested queue
-                requestQueue.getDispatcher().injectRequest(this);
+                inviteeQueue.getDispatcher().injectRequest(this);
             }
             else {
                 // No workgroup was found for the specified invitee. Send a Message with the error
@@ -191,6 +205,13 @@ public class TransferRequest extends Request {
         super.offerAccepted(agentSession);
         // Keep track when the offer was accepted by the agent
         offerAccepted = Instant.now();
+
+        // Send invitations
+        sendMUCInvitation(agentSession.getJID());
+
+        // After the transfer is successful and the new agent accepts the chat, the previous agent should be kicked from the room
+        String serviceName = WorkgroupManager.getInstance().getMUCServiceName();
+        kickInviterFromRoom(sessionID + "@" + serviceName);
     }
 
     @Override
@@ -237,23 +258,12 @@ public class TransferRequest extends Request {
 
     @Override
     public void userJoinedRoom(JID roomJID, JID user) {
-        Log.debug("User "+user+" has joined "+roomJID+". User should be kicked.");
+        Log.debug("User " + user + " has joined " + roomJID + ". User " + inviter + " should be kicked.");
         if (actualInvitee != null && actualInvitee.toBareJID().equals(user.toBareJID())) {
             joinedRoom = System.currentTimeMillis();
             // This request has been completed so remove it from the list of related
             // requests of the original user request
             userRequest.removeRelatedRequest(this);
-            // Kick the inviter from the room
-            IQ kick = new IQ(IQ.Type.set);
-            kick.setTo(roomJID);
-            kick.setFrom(workgroup.getFullJID());
-            Element childElement = kick.setChildElement("query", "http://jabber.org/protocol/muc#admin");
-            Element item = childElement.addElement("item");
-            item.addAttribute("jid", inviter.toString());
-            item.addAttribute("role", "none");
-            item.addElement("reason").setText("Transfer was successful");
-            workgroup.send(kick);
-            Log.debug("Sent kicked to  "+user+" in room "+roomJID+".");
         }
     }
 
@@ -264,6 +274,21 @@ public class TransferRequest extends Request {
             Log.debug("Agent or user failed to join room "+roomID);
             // Send error message to inviter
             sendErrorMessage("Agent or user failed to join the room.");
+        }
+    }
+
+    @Override
+    public void cancel(Request.CancelType type) {
+        super.cancel(type);
+
+        JID sender = workgroup.getJID();
+        if (inviteeQueue != null) {
+            try {
+                // Notify the user that he has left the queue
+                WorkgroupCompatibleClient.getInstance().notifyQueueDepartued(sender, userRequest.getUserJID(), userRequest, type);
+            } catch (Exception e) {
+                Log.error(e.getMessage(), e);
+            }
         }
     }
 
@@ -288,26 +313,41 @@ public class TransferRequest extends Request {
     /**
      * Sends a standard MUC invitation to the invitee.
      */
-    private void sendMUCInvitiation() {
+    private void sendMUCInvitation(JID inviteeJID) {
         // Keep track of the actual entity that received the transfer offer
-        actualInvitee = invitee;
+        actualInvitee = inviteeJID != null ? inviteeJID : invitee;
 
         final String serviceName = WorkgroupManager.getInstance().getMUCServiceName();
         final String roomName = sessionID + "@" + serviceName;
 
-        Invitation invitation = new Invitation(invitee.toString(), reason);
+        Invitation invitation = new Invitation(actualInvitee.toString(), reason);
         invitation.setTo(roomName);
-        invitation.setFrom(inviter);
+        invitation.setFrom(userRequest.getWorkgroup().getFullJID());
         // Add workgroup extension that includes the JID of the workgroup
         Element element = invitation.addChildElement("workgroup", "http://jabber.org/protocol/workgroup");
         element.addAttribute("jid", workgroup.getJID().toBareJID());
         // Add custom extension that includes the sessionID
         element = invitation.addChildElement("session", "http://jivesoftware.com/protocol/workgroup");
+        element.addAttribute("workgroup", workgroup.getJID().toString());
         element.addAttribute("id", sessionID);
         RoomInterceptorManager interceptorManager = RoomInterceptorManager.getInstance();
         interceptorManager.invokeInterceptors(workgroup.getJID().toBareJID(), invitation, false, false);
         workgroup.send(invitation);
         interceptorManager.invokeInterceptors(workgroup.getJID().toBareJID(), invitation, false, true);
+    }
+
+    private void kickInviterFromRoom(String roomJid) {
+        // Kick the inviter from the room
+        IQ kick = new IQ(IQ.Type.set);
+        kick.setTo(roomJid);
+        kick.setFrom(workgroup.getFullJID());
+        Element childElement = kick.setChildElement("query", "http://jabber.org/protocol/muc#admin");
+        Element item = childElement.addElement("item");
+        item.addAttribute("jid", inviter.toString());
+        item.addAttribute("role", "none");
+        item.addElement("reason").setText("Transfer was successful");
+        workgroup.send(kick);
+        Log.debug("Sent kicked to " + inviter + " in room " + roomJid + ".");
     }
 
     /**
