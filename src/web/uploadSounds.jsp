@@ -5,16 +5,16 @@
                  org.apache.commons.fileupload.DiskFileUpload,
                  org.apache.commons.fileupload.FileItem,
                  org.apache.commons.fileupload.FileUploadException,
-                 org.xmpp.component.ComponentManagerFactory,
                  org.xmpp.packet.JID,
+                 java.util.Base64,
                  java.util.Iterator,
                  java.util.List,
-				 org.slf4j.LoggerFactory,	
-                 org.jivesoftware.util.StringUtils,
+				 org.slf4j.LoggerFactory,
                  org.jivesoftware.openfire.user.UserNotFoundException,
                  org.jivesoftware.xmpp.workgroup.UnauthorizedException,
                  org.jivesoftware.xmpp.workgroup.DbProperties"
 %>
+<%@ page import="java.util.Base64" %>
 <%
     DiskFileUpload upload = new DiskFileUpload();
     List items = null;
@@ -60,7 +60,7 @@
  <%!
      private String encode(byte[] data) {
          try {
-             final String encodedFile = StringUtils.encodeBase64(data);
+             final String encodedFile = Base64.getEncoder().encodeToString(data);
              return encodedFile;
          }
          catch (Exception ex) {

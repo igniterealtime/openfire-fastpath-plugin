@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 1999-2008 Jive Software. All rights reserved.
+ * Copyright (C) 1999-2008 Jive Software, 2025 Ignite Realtime Foundation. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,8 @@
 package org.jivesoftware.openfire.fastpath;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -25,7 +27,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.jivesoftware.openfire.user.UserNotFoundException;
-import org.jivesoftware.util.StringUtils;
 import org.jivesoftware.xmpp.workgroup.Workgroup;
 import org.jivesoftware.xmpp.workgroup.WorkgroupManager;
 import org.slf4j.Logger;
@@ -71,13 +72,13 @@ public class SoundServlet extends HttpServlet {
             if (action != null) {
                 if ("incoming".equals(action.trim())) {
                     String incomingMessage = workgroup.getProperties().getProperty("incomingSound");
-                    byte[] incomingBytes = StringUtils.decodeBase64(incomingMessage);
+                    byte[] incomingBytes = Base64.getDecoder().decode(incomingMessage);
                     response.getOutputStream().write(incomingBytes);
                 }
                 else if ("outgoing".equals(action.trim())) {
                     String outgoingMessage = workgroup.getProperties().getProperty("outgoingSound");
-                    String outgoingBytes = StringUtils.encodeBase64(outgoingMessage);
-                    response.getOutputStream().write(outgoingBytes.getBytes("UTF-8"));
+                    String outgoingBytes = Base64.getEncoder().encodeToString(outgoingMessage.getBytes(StandardCharsets.UTF_8));
+                    response.getOutputStream().write(outgoingBytes.getBytes(StandardCharsets.UTF_8));
                 }
             }
         }

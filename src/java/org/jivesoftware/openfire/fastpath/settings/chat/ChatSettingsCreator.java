@@ -21,6 +21,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,7 +29,6 @@ import org.jivesoftware.openfire.XMPPServer;
 import org.jivesoftware.openfire.container.Plugin;
 import org.jivesoftware.openfire.container.PluginManager;
 import org.jivesoftware.openfire.user.UserNotFoundException;
-import org.jivesoftware.util.StringUtils;
 import org.jivesoftware.xmpp.workgroup.UnauthorizedException;
 import org.jivesoftware.xmpp.workgroup.Workgroup;
 import org.jivesoftware.xmpp.workgroup.WorkgroupManager;
@@ -280,7 +280,7 @@ public class ChatSettingsCreator {
                         throw new IOException("Failed to read all image bytes.");
                     }
                     stream.close();
-                    final String encodedFile = StringUtils.encodeBase64(bytes);
+                    final String encodedFile = Base64.getEncoder().encodeToString(bytes);
 
                     createImageChatSetting(workgroupJID, key,
                             ChatSettings.SettingType.image_settings, encodedFile);
@@ -419,7 +419,7 @@ public class ChatSettingsCreator {
                         throw new IOException("Failed to read all bytes.");
                     }
                     stream.close();
-                    final String encodedFile = StringUtils.encodeBase64(bytes);
+                    final String encodedFile = Base64.getEncoder().encodeToString(bytes);
 
                     createChatSetting(workgroupJID, key, ChatSettings.SettingType.image_settings,
                             encodedFile);
