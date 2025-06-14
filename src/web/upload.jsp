@@ -1,13 +1,14 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ page import="org.jivesoftware.xmpp.workgroup.Workgroup,
                  org.jivesoftware.xmpp.workgroup.WorkgroupManager,
-                 org.xmpp.component.ComponentManagerFactory,
-				 org.slf4j.LoggerFactory,					 
+				 org.slf4j.LoggerFactory,
                  org.xmpp.packet.JID,
+                 java.util.Base64,
                  java.util.Iterator,
                  java.util.List,
-                 org.jivesoftware.openfire.fastpath.settings.chat.ChatSettingsManager, org.jivesoftware.openfire.user.UserNotFoundException, org.jivesoftware.openfire.fastpath.settings.chat.ChatSetting, org.jivesoftware.util.StringUtils, org.apache.commons.fileupload.DiskFileUpload, org.apache.commons.fileupload.FileItem, org.apache.commons.fileupload.FileUploadException"
+                 org.jivesoftware.openfire.fastpath.settings.chat.ChatSettingsManager, org.jivesoftware.openfire.user.UserNotFoundException, org.jivesoftware.openfire.fastpath.settings.chat.ChatSetting, org.apache.commons.fileupload.DiskFileUpload, org.apache.commons.fileupload.FileItem, org.apache.commons.fileupload.FileUploadException"
 %>
+<%@ page import="java.util.Base64" %>
 <%
     DiskFileUpload upload = new DiskFileUpload();
     List items = null;
@@ -63,7 +64,7 @@
  <%!
      private String encode(byte[] data) {
          try {
-             final String encodedFile = StringUtils.encodeBase64(data);
+             final String encodedFile = Base64.getEncoder().encodeToString(data);
              return encodedFile;
          }
          catch (Exception ex) {

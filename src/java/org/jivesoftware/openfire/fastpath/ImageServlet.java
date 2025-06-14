@@ -1,6 +1,7 @@
 package org.jivesoftware.openfire.fastpath;
 
 import java.io.IOException;
+import java.util.Base64;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -13,7 +14,6 @@ import org.jivesoftware.openfire.fastpath.settings.chat.ChatSetting;
 import org.jivesoftware.openfire.fastpath.settings.chat.ChatSettings;
 import org.jivesoftware.openfire.fastpath.settings.chat.ChatSettingsManager;
 import org.jivesoftware.openfire.user.UserNotFoundException;
-import org.jivesoftware.util.StringUtils;
 import org.jivesoftware.xmpp.workgroup.Workgroup;
 import org.jivesoftware.xmpp.workgroup.WorkgroupManager;
 import org.slf4j.Logger;
@@ -119,6 +119,6 @@ public class ImageServlet extends HttpServlet {
             return null;
         }
 
-        return StringUtils.decodeBase64(encodedValue);
+        return Base64.getDecoder().decode(encodedValue);
     }
 }

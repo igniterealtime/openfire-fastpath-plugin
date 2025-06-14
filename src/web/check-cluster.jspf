@@ -2,10 +2,9 @@
 <%@ page import="org.jivesoftware.openfire.cluster.ClusterManager" %>
 <%@ page import="org.jivesoftware.util.cache.CacheFactory" %>
 <%@ page import="org.jivesoftware.openfire.container.GetAdminConsoleInfoTask" %>
-<%@ page import="org.jivesoftware.util.StringUtils" %>
-<%@ page import="org.jivesoftware.util.Base64" %>
 <%@ page import="org.jivesoftware.openfire.XMPPServer" %>
 <%@ page import="org.jivesoftware.openfire.auth.AuthToken" %>
+<%@ page import="java.util.Base64" %>
 <%
     if (!ClusterManager.isSeniorClusterMember()) {
 
@@ -23,8 +22,7 @@
             sb.append(request.isSecure() ? info.getAdminSecurePort() : info.getAdminPort());
             sb.append("/login.jsp?login=true&username=").append(authToken.getUsername());
             sb.append("&secret=").append(StringUtils.hash(info.getAdminSecret()));
-            sb.append("&nodeID=")
-                    .append(Base64.encodeBytes(XMPPServer.getInstance().getNodeID().toByteArray(), Base64.URL_SAFE));
+            sb.append("&nodeID=").append(Base64.getUrlEncoder().encodeToString(XMPPServer.getInstance().getNodeID().toByteArray()));
             sb.append("&url=/plugins/fastpath/workgroup-summary.jsp");
 
             response.sendRedirect(sb.toString());
