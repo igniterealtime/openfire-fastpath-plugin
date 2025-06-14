@@ -23,6 +23,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.Duration;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -43,7 +46,6 @@ import org.jivesoftware.database.SequenceManager;
 import org.jivesoftware.openfire.fastpath.util.TaskEngine;
 import org.jivesoftware.openfire.group.Group;
 import org.jivesoftware.openfire.muc.Role;
-import org.jivesoftware.util.FastDateFormat;
 import org.jivesoftware.util.NotFoundException;
 import org.jivesoftware.util.StringUtils;
 import org.jivesoftware.xmpp.workgroup.chatbot.Chatbot;
@@ -107,9 +109,6 @@ public class Workgroup {
             "DELETE FROM fpQueue WHERE queueID=?";
     private static final String DELETE_QUEUE_PROPS =
             "DELETE FROM fpDispatcherProp WHERE ownerID=?";
-
-    private static final FastDateFormat UTC_FORMAT = FastDateFormat
-        .getInstance("yyyyMMdd'T'HH:mm:ss", TimeZone.getTimeZone("GMT+0"));
 
     /**
      * Flag indicating if the workgroup should accept new requests.
@@ -672,7 +671,7 @@ public class Workgroup {
                         if (p instanceof Message) {
                             Message storedMessage = (Message)p;
                             Element delay = storedMessage.addChildElement("x", "jabber:x:delay");
-                            delay.addAttribute("stamp", UTC_FORMAT.format(date));
+                            delay.addAttribute("stamp", DateTimeFormatter.ISO_LOCAL_DATE_TIME.withZone(ZoneOffset.UTC).format(date.toInstant())); //
                             if (ModelUtil.hasLength(storedMessage.getBody())) {
                                 buf.append(p.toXML());
                             }
@@ -680,7 +679,7 @@ public class Workgroup {
                         else {
                             Presence storedPresence = (Presence)p;
                             Element delay = storedPresence.addChildElement("x", "jabber:x:delay");
-                            delay.addAttribute("stamp", UTC_FORMAT.format(date));
+                            delay.addAttribute("stamp",DateTimeFormatter.ISO_LOCAL_DATE_TIME.withZone(ZoneOffset.UTC).format(date.toInstant()));
                             buf.append(p.toXML());
                         }
                         // Append an XML representation of the packet to the string buffer
@@ -710,7 +709,7 @@ public class Workgroup {
                         if (p instanceof Message) {
                             Message storedMessage = (Message)p;
                             Element delay = storedMessage.addChildElement("x", "jabber:x:delay");
-                            delay.addAttribute("stamp", UTC_FORMAT.format(date));
+                            delay.addAttribute("stamp", DateTimeFormatter.ISO_LOCAL_DATE_TIME.withZone(ZoneOffset.UTC).format(date.toInstant()));
                             if (ModelUtil.hasLength(storedMessage.getBody())) {
                                 buf.append(p.toXML());
                             }
@@ -718,7 +717,7 @@ public class Workgroup {
                         else {
                             Presence storedPresence = (Presence)p;
                             Element delay = storedPresence.addChildElement("x", "jabber:x:delay");
-                            delay.addAttribute("stamp", UTC_FORMAT.format(date));
+                            delay.addAttribute("stamp", DateTimeFormatter.ISO_LOCAL_DATE_TIME.withZone(ZoneOffset.UTC).format(date.toInstant()));
                             buf.append(p.toXML());
                         }
                         // Append an XML representation of the packet to the string buffer
@@ -1561,7 +1560,7 @@ public class Workgroup {
                         Element occupantInfo = occupantsInfo.addElement("occupant");
                         occupantInfo.addElement("jid").setText(userJID);
                         occupantInfo.addElement("nickname").setText(presence.getFrom().getResource());
-                        occupantInfo.addElement("joined").setText(UTC_FORMAT.format(packets.get(p)));
+                        occupantInfo.addElement("joined").setText(DateTimeFormatter.ISO_LOCAL_DATE_TIME.withZone(ZoneOffset.UTC).format(packets.get(p).toInstant()));
                     }
                 }
             }
