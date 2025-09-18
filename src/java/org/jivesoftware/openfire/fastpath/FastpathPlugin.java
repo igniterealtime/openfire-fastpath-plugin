@@ -23,6 +23,7 @@ import java.nio.file.Path;
 import java.util.*;
 
 import org.eclipse.jetty.ee8.webapp.WebAppContext;
+import org.eclipse.jetty.server.handler.CrossOriginHandler;
 import org.jivesoftware.openfire.cluster.ClusterEventListener;
 import org.jivesoftware.openfire.cluster.ClusterManager;
 import org.jivesoftware.openfire.container.Plugin;
@@ -134,7 +135,13 @@ public class FastpathPlugin implements Plugin, ClusterEventListener {
     {
         Log.info("start webchat");
 
+        final CrossOriginHandler corsHandler = new CrossOriginHandler();
+        corsHandler.setAllowedMethods(Set.of("GET", "POST", "HEAD"));
+        corsHandler.setAllowedOriginPatterns(Set.of("*"));
+        corsHandler.setAllowedHeaders(Set.of("*"));
+
         context = new WebAppContext(null, pluginDirectory.getPath() + "/classes", "/webchat");
+        context.insertHandler(corsHandler);
         context.setClassLoader(this.getClass().getClassLoader());
         context.setWelcomeFiles(new String[]{"index.jsp"});
         HttpBindManager.getInstance().addJettyHandler(context);
@@ -144,6 +151,8 @@ public class FastpathPlugin implements Plugin, ClusterEventListener {
     {
         Log.info("stop webchat");
         HttpBindManager.getInstance().removeJettyHandler(context);
+        context.destroy();
+        context = null;
     }
 
     public WorkgroupManager getWorkgroupManager() {
